@@ -49,7 +49,7 @@ void begin_frame() {
   ImGui::NewFrame();
 }
 
-void draw(UiState &state) {
+void draw(SDL_Texture *framebuffer_tex) {
   ImGuiIO &io = ImGui::GetIO();
   io.FontGlobalScale = 2.f;
 
@@ -88,6 +88,10 @@ void draw(UiState &state) {
   // 若你准备把 framebuffer 转成 SDL_Texture* 显示到 ImGui（推荐未来做）：
   // ImVec2 avail = ImGui::GetContentRegionAvail();
   // ImGui::Image((ImTextureID)fbTex, avail);
+  if (framebuffer_tex) {
+    ImVec2 avail = ImGui::GetContentRegionAvail();
+    ImGui::Image((ImTextureID)framebuffer_tex, avail);
+  }
 
   ImGui::EndChild();
 
