@@ -20,6 +20,6 @@ public:
 private:
   SDL_Window *m_window = nullptr;
   SDL_Renderer *m_renderer = nullptr;
-  bool m_running = true;
+  // bool m_running = true;
 };
 } // namespace platform

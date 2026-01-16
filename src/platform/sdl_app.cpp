@@ -44,6 +44,7 @@ void SdlApp::shutdown() {
 // bool SdlApp::poll_events() {
 //   SDL_Event e;
 //   while (SDL_PollEvent(&e)) {
+//     ui::process_event(e);
 //     if (e.type == SDL_QUIT) {
 //       m_running = false;
 //     }
