@@ -19,7 +19,17 @@ int main() {
   bool running = true;
   while (running) {
     // event
-    running = app.poll_events();
+    // running = app.poll_events();
+    SDL_Event e;
+    while (SDL_PollEvent(&e)) {
+      if (e.type == SDL_QUIT) {
+        running = false;
+      }
+      if (e.type == SDL_WINDOWEVENT &&
+          e.window.event == SDL_WINDOWEVENT_CLOSE) {
+        running = false;
+      }
+    }
 
     // app
     app.begin_frame();

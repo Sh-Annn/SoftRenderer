@@ -1,7 +1,5 @@
 #include "sdl_app.h"
 
-#include "../ui/ui_layer.h"
-
 #include <iostream>
 
 namespace platform {
@@ -43,20 +41,20 @@ void SdlApp::shutdown() {
   SDL_Quit();
 }
 
-bool SdlApp::poll_events() {
-  SDL_Event e;
-  while (SDL_PollEvent(&e)) {
-    ui::process_event(e);
-    if (e.type == SDL_QUIT) {
-      m_running = false;
-    }
-    if (e.type == SDL_WINDOWEVENT && e.window.event == SDL_WINDOWEVENT_CLOSE) {
-      m_running = false;
-    }
-  }
-
-  return m_running;
-}
+// bool SdlApp::poll_events() {
+//   SDL_Event e;
+//   while (SDL_PollEvent(&e)) {
+//     if (e.type == SDL_QUIT) {
+//       m_running = false;
+//     }
+//     if (e.type == SDL_WINDOWEVENT && e.window.event == SDL_WINDOWEVENT_CLOSE)
+//     {
+//       m_running = false;
+//     }
+//   }
+//
+//   return m_running;
+// }
 
 void SdlApp::begin_frame() {
   SDL_SetRenderDrawColor(m_renderer, 255, 255, 255, 255);

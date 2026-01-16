@@ -8,7 +8,7 @@ public:
   bool init(const char *title, int w, int h);
   void shutdown();
 
-  bool poll_events(); // is quit? false->quit
+  // bool poll_events(); // is quit? false->quit
   void begin_frame(); // clear
   void end_frame();   // present
 
