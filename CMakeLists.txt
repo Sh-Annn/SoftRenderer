@@ -26,6 +26,7 @@ target_include_directories(imgui PUBLIC
 	${IMGUI_DIR}
 	${IMGUI_DIR}/backends
 	${SDL2_INCLUDE_DIRS}
+	${CMAKE_SOURCE_DIR}/src
 )
 
 target_compile_options(imgui PRIVATE ${SDL2_CFLAGS_OTHER})
@@ -36,6 +37,7 @@ add_library(core STATIC
 )
 target_include_directories(core PUBLIC
 	${CMAKE_SOURCE_DIR}/src/core
+	${CMAKE_SOURCE_DIR}/src
 )
 
 # platform layer ---------------------------------------------
@@ -46,6 +48,7 @@ add_library(platform STATIC
 target_include_directories(platform PUBLIC
 	${CMAKE_SOURCE_DIR}/src/platform
 	${SDL2_INCLUDE_DIRS}
+	${CMAKE_SOURCE_DIR}/src
 )
 target_link_libraries(platform PUBLIC ${SDL2_LIBRARIES})
 target_compile_options(platform PUBLIC ${SDL2_CFLAGS_OTHER})
@@ -57,6 +60,7 @@ add_library(ui STATIC
 target_include_directories(ui PUBLIC
 	${CMAKE_SOURCE_DIR}/src/ui
 	${SDL2_INCLUDE_DIRS}
+	${CMAKE_SOURCE_DIR}/src
 )
 target_link_libraries(ui PUBLIC
 	imgui
