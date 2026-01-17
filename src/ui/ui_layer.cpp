@@ -11,6 +11,8 @@ struct Fonts {
 };
 Fonts g_fonts;
 
+static bool g_render_panel_hovered = false;
+
 void InitFonts(float dpi_scale) {
   ImGuiIO &io = ImGui::GetIO();
 
@@ -68,8 +70,8 @@ void draw(SDL_Texture *framebuffer_tex) {
 
   ImGui::Begin("##MainLayout", nullptr, layout_flags);
 
-  // 2) 右侧调试固定宽度
-  const float debug_w = 360.0f; // 你要的固定宽度
+  // 2 右侧调试固定宽度
+  const float debug_w = 360.0f; // 固定宽度
   const float spacing = ImGui::GetStyle().ItemSpacing.x;
 
   // 左：渲染区域（宽度 = 剩余）
@@ -78,20 +80,17 @@ void draw(SDL_Texture *framebuffer_tex) {
                     ImGuiWindowFlags_NoMove |
                         ImGuiWindowFlags_NoScrollWithMouse);
 
-  // ——这里放你的“渲染画面显示区域”——
-  // 如果你目前是 SDL 直接把 framebuffer present 到窗口：
-  //   你仍然可以在这里放交互逻辑/提示文字/未来换成 ImGui::Image 显示 fb texture
   ImGui::Text("Render Viewport");
   ImGui::PopFont();
   ImGui::Separator();
 
-  // 若你准备把 framebuffer 转成 SDL_Texture* 显示到 ImGui（推荐未来做）：
-  // ImVec2 avail = ImGui::GetContentRegionAvail();
-  // ImGui::Image((ImTextureID)fbTex, avail);
+  // 把 framebuffer 转成 SDL_Texture* 显示到 ImGui：
   if (framebuffer_tex) {
     ImVec2 avail = ImGui::GetContentRegionAvail();
     ImGui::Image((ImTextureID)framebuffer_tex, avail);
   }
+
+  g_render_panel_hovered = ImGui::IsWindowHovered();
 
   ImGui::EndChild();
 
@@ -124,4 +123,6 @@ void end_frame(SDL_Renderer *renderer) {
   ImGui::Render();
   ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), renderer);
 }
+
+bool is_mouse_in_render_area() { return g_render_panel_hovered; }
 } // namespace ui

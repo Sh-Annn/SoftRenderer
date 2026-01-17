@@ -54,12 +54,14 @@ int main() {
       }
     }
 
-    if (input.is_key_down(SDL_SCANCODE_W)) {
-      std::cout << "W pressed\n";
-    }
-    if (input.is_mouse_button_down(SDL_BUTTON_RIGHT)) {
-      std::cout << "Right mouse: dx=" << input.mouse_delta_x()
-                << " dy=" << input.mouse_delta_y() << '\n';
+    if (ui::is_mouse_in_render_area()) {
+      if (input.is_key_down(SDL_SCANCODE_W)) {
+        std::cout << "W pressed\n";
+      }
+      if (input.is_mouse_button_down(SDL_BUTTON_RIGHT)) {
+        std::cout << "Right mouse: dx=" << input.mouse_delta_x()
+                  << " dy=" << input.mouse_delta_y() << '\n';
+      }
     }
 
     rasterizer.clear();

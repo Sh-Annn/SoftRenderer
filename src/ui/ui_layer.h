@@ -11,4 +11,6 @@ void draw(SDL_Texture *framebuffer_tex);
 void end_frame(SDL_Renderer *renderer);
 
 void process_event(const SDL_Event &e);
+
+bool is_mouse_in_render_area();
 } // namespace ui
