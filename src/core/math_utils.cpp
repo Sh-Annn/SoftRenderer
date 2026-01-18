@@ -21,8 +21,8 @@ mat4 scale(const Vec3 &scale_factors) {
   mat4 result(1.0f);
 
   result[0][0] = scale_factors.x;
-  result[0][1] = scale_factors.y;
-  result[0][2] = scale_factors.z;
+  result[1][1] = scale_factors.y;
+  result[2][2] = scale_factors.z;
 
   return result;
 }
