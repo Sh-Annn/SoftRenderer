@@ -22,6 +22,8 @@ int main() {
     return 1;
   }
 
+  ui::UiState ui_state;
+
   ui::init(app.window(), app.renderer());
 
   const int fb_width = 500;
@@ -167,7 +169,7 @@ int main() {
 
     // ui
     ui::begin_frame();
-    ui::draw(fb_texture.texture());
+    ui::draw(fb_texture.texture(), ui_state, &camera, &rasterizer);
     ui::end_frame(app.renderer());
 
     app.end_frame();
