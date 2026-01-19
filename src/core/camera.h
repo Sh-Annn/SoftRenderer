@@ -27,6 +27,7 @@ public:
   void set_perspective(float fov, float aspect, float near, float far);
   void set_orthographic(float left, float right, float bottom, float top,
                         float near, float far);
+  void sync_orthographic_to_perspective(float distance);
 
   void set_projection_type(ProjectionType type) { m_projection_type = type; }
   ProjectionType projection_type() const { return m_projection_type; }
@@ -63,11 +64,12 @@ private:
   float m_near = 0.1f;
   float m_far = 100.f;
 
-  float m_ortho_left = -10.f;
-  float m_ortho_right = 10.f;
-  float m_ortho_bottom = -10.f;
-  float m_ortho_top = 10.f;
-  float m_ortho_near = 10.f;
+  // orthographic scale
+  float m_ortho_left = -2.f;
+  float m_ortho_right = 2.f;
+  float m_ortho_bottom = -2.f;
+  float m_ortho_top = 2.f;
+  float m_ortho_near = 0.1f;
   float m_ortho_far = 100.f;
 
   Vec3 m_initial_position;

@@ -35,6 +35,13 @@ void Camera::rotate(float pitch_delta, float yaw_delta) {
     m_pitch = -89.f;
   }
 
+  if (m_yaw > 359.f) {
+    m_yaw = 0.f;
+  }
+  if (m_yaw < -359.f) {
+    m_yaw = 0.f;
+  }
+
   update_vectors();
 }
 
@@ -90,5 +97,16 @@ void Camera::set_orthographic(float left, float right, float bottom, float top,
   m_ortho_near = near;
   m_ortho_far = far;
   m_projection_type = ProjectionType::Orthographic;
+}
+void Camera::sync_orthographic_to_perspective(float distance) {
+  float half_height = distance * tan(math::radians(m_fov / 2.f));
+  float half_width = half_height * m_aspect;
+
+  m_ortho_left = -half_width;
+  m_ortho_right = half_width;
+  m_ortho_bottom = -half_height;
+  m_ortho_top = half_height;
+  m_ortho_near = m_near;
+  m_ortho_far = m_far;
 }
 } // namespace core
