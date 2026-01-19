@@ -1,5 +1,8 @@
 #include "ui_layer.h"
 
+#include "../core/camera.h"
+#include "../core/rasterizer.h"
+
 #include "backends/imgui_impl_sdl2.h"
 #include "backends/imgui_impl_sdlrenderer2.h"
 #include "imgui.h"
@@ -51,7 +54,8 @@ void begin_frame() {
   ImGui::NewFrame();
 }
 
-void draw(SDL_Texture *framebuffer_tex) {
+void draw(SDL_Texture *framebuffer_tex, UiState &state, core::Camera *camera,
+          core::Rasterizer *rasterizer) {
   ImGuiIO &io = ImGui::GetIO();
   io.FontGlobalScale = 2.f;
 
@@ -71,7 +75,7 @@ void draw(SDL_Texture *framebuffer_tex) {
   ImGui::Begin("##MainLayout", nullptr, layout_flags);
 
   // 2 右侧调试固定宽度
-  const float debug_w = 360.0f; // 固定宽度
+  const float debug_w = 400.0f; // 固定宽度
   const float spacing = ImGui::GetStyle().ItemSpacing.x;
 
   // 左：渲染区域（宽度 = 剩余）
@@ -108,8 +112,76 @@ void draw(SDL_Texture *framebuffer_tex) {
   ImGui::PushFont(g_fonts.normal);
   ImGui::Separator();
 
-  float text = 1.0f;
-  ImGui::SliderFloat("text111111111", &text, 1.f, 30.f);
+  // information panel
+  if (ImGui::CollapsingHeader("Performance", ImGuiTreeNodeFlags_DefaultOpen)) {
+    ImGui::Text("FPS: %.1f", io.Framerate);
+    ImGui::Text("Frame Time: %.3f ms", 1000.f / io.Framerate);
+  }
+  // camera
+  if (camera &&
+      ImGui::CollapsingHeader("Camera", ImGuiTreeNodeFlags_DefaultOpen)) {
+    const Vec3 &pos = camera->postion();
+    ImGui::Text("Position:");
+    ImGui::Indent();
+    ImGui::Text("X: %.2f", pos.x);
+    ImGui::Text("Y: %.2f", pos.y);
+    ImGui::Text("Z: %.2f", pos.z);
+    ImGui::Unindent();
+
+    ImGui::Separator();
+
+    ImGui::Text("Rotation:");
+    ImGui::Indent();
+    ImGui::Text("Pitch: %.1f°", camera->pitch());
+    ImGui::Text("Yaw: %.1f°", camera->yaw());
+    ImGui::Unindent();
+
+    ImGui::Separator();
+
+    float fov = camera->fov();
+    if (ImGui::SliderFloat("FOV", &fov, 10.f, 90.f, "%.1f°")) {
+      camera->set_fov(fov);
+    }
+
+    ImGui::Separator();
+
+    if (ImGui::Button("Reset Camera", ImVec2(-1, 0))) {
+      camera->reset();
+    }
+  }
+  // rasterizer
+  if (camera && rasterizer &&
+      ImGui::CollapsingHeader("Render Settings",
+                              ImGuiTreeNodeFlags_DefaultOpen)) {
+    const char *projection_types[] = {"Perspective", "Orthographic"};
+    int current_projection =
+        (camera->projection_type() == core::ProjectionType::Perspective) ? 0
+                                                                         : 1;
+    if (ImGui::Combo("Projection", &current_projection, projection_types, 2)) {
+      if (current_projection == 0) {
+        camera->set_projection_type(core::ProjectionType::Perspective);
+      } else {
+        camera->set_projection_type(core::ProjectionType::Orthographic);
+      }
+    }
+
+    ImGui::Separator();
+
+    bool depth_test = state.depth_test_enabled;
+    if (ImGui::Checkbox("Depth Test", &depth_test)) {
+      state.depth_test_enabled = depth_test;
+      rasterizer->set_depth_test_enabled(depth_test);
+    }
+
+    if (!depth_test) {
+      ImGui::SameLine();
+      ImGui::TextColored(ImVec4(1, 0.5f, 0, 1), "(!)");
+      if (ImGui::IsItemHovered()) {
+        ImGui::SetTooltip(
+            "Depth test disabled - triangles may overlap incorrectly");
+      }
+    }
+  }
 
   ImGui::PopFont();
   ImGui::EndChild();
