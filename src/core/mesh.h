@@ -9,9 +9,11 @@ public:
   Mesh() = default;
 
   std::vector<Vec3> positions;
+  std::vector<Vec3> normals;
+  std::vector<Vec2> texcoords;
+
   std::vector<int> indices;
 
-  std::vector<Vec3> normals;
   std::vector<Color> vertex_colors;
   std::vector<Color> triangle_colors;
 
@@ -19,6 +21,7 @@ public:
   int vertex_count() const { return static_cast<int>(positions.size()); }
 
   bool has_normals() const { return !normals.empty(); }
+  bool has_texcoords() const { return !texcoords.empty(); }
   bool use_vertex_colors() const { return !vertex_colors.empty(); }
   bool use_triangle_colors() const { return !triangle_colors.empty(); }
 

@@ -31,6 +31,9 @@ target_include_directories(imgui PUBLIC
 
 target_compile_options(imgui PRIVATE ${SDL2_CFLAGS_OTHER})
 
+# stb_image --------------------------------------------------
+include_directories(${CMAKE_SOURCE_DIR}/libs/stb)
+
 # core library -----------------------------------------------
 add_library(core STATIC
 	${CMAKE_SOURCE_DIR}/src/core/rasterizer.cpp
@@ -39,6 +42,7 @@ add_library(core STATIC
 	${CMAKE_SOURCE_DIR}/src/core/renderer.cpp
 	${CMAKE_SOURCE_DIR}/src/core/mesh.cpp
 	${CMAKE_SOURCE_DIR}/src/core/mesh_loarder.cpp
+	${CMAKE_SOURCE_DIR}/src/core/texture.cpp
 
 )
 target_include_directories(core PUBLIC

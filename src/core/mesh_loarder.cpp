@@ -16,6 +16,7 @@ Mesh MeshLoader::load_obj(const std::string &filename, Color default_color) {
 
   std::vector<Vec3> temp_positions;
   std::vector<Vec3> temp_normals;
+  std::vector<Vec2> temp_texcoords;
 
   std::string line;
   while (std::getline(file, line)) {
@@ -31,6 +32,10 @@ Mesh MeshLoader::load_obj(const std::string &filename, Color default_color) {
       Vec3 normal;
       iss >> normal.x >> normal.y >> normal.z;
       temp_normals.push_back(normal);
+    } else if (prefix == "vt") {
+      Vec2 uv;
+      iss >> uv.x >> uv.y;
+      temp_texcoords.push_back(uv);
     } else if (prefix == "f") {
       std::string v1_str, v2_str, v3_str;
       iss >> v1_str >> v2_str >> v3_str;
@@ -64,6 +69,11 @@ Mesh MeshLoader::load_obj(const std::string &filename, Color default_color) {
         mesh.normals.push_back(temp_normals[vn1]);
         mesh.normals.push_back(temp_normals[vn2]);
         mesh.normals.push_back(temp_normals[vn3]);
+      }
+      if (vt1 > 0 && vt2 > 0 && vt3 > 0) {
+        mesh.texcoords.push_back(temp_texcoords[vt1 - 1]);
+        mesh.texcoords.push_back(temp_texcoords[vt2 - 1]);
+        mesh.texcoords.push_back(temp_texcoords[vt3 - 1]);
       }
     }
   }
