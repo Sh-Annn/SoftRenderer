@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../types.h"
-#include <string>
 #include <vector>
 
 namespace core {
@@ -16,7 +15,7 @@ public:
   std::vector<Color> vertex_colors;
   std::vector<Color> triangle_colors;
 
-  int triangle_count() const { return static_cast<int>(indices.size()); }
+  int triangle_count() const { return static_cast<int>(indices.size()) / 3; }
   int vertex_count() const { return static_cast<int>(positions.size()); }
 
   bool has_normals() const { return !normals.empty(); }
