@@ -76,7 +76,7 @@ int main() {
 
   platform::Input input;
 
-  core::Camera camera(Vec3(0, 0, 3), Vec3(0, 0, 0), Vec3(0, 1, 0));
+  core::Camera camera(Vec3(0, 0, 5), Vec3(0, 0, 0), Vec3(0, 1, 0));
   // camera.set_perspective(45.f, (float)fb_width / fb_height, 0.1f, 100.f);
   camera.set_perspective(45.f, (float)fb_width / fb_height, 0.1f, 100.f);
   camera.sync_orthographic_to_perspective(4.f);

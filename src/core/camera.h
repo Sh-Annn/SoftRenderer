@@ -7,7 +7,7 @@ enum class ProjectionType { Perspective, Orthographic };
 
 class Camera {
 public:
-  Camera(const Vec3 &position = Vec3(0, 0, 3),
+  Camera(const Vec3 &position = Vec3(0, 0, 5),
          const Vec3 &target = Vec3(0, 0, 0), const Vec3 &up = Vec3(0, 1, 0));
 
   void move_forward(float distance);
