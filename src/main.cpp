@@ -1,5 +1,7 @@
 #include "SDL_scancode.h"
 #include "core/camera.h"
+#include "core/mesh.h"
+#include "core/mesh_loarder.h"
 #include "core/rasterizer.h"
 #include "core/renderer.h"
 #include "platform/input.h"
@@ -33,40 +35,32 @@ int main() {
   rasterizer.Init(fb_width, fb_height);
 
   core::Renderer renderer(&rasterizer, fb_width, fb_height);
-  Vec3 cube_vs[8] = {
-      // -z
-      Vec3(-1, 1, -1), Vec3(1, 1, -1), Vec3(1, -1, -1), Vec3(-1, -1, -1),
-      // +z
-      Vec3(-1, 1, 1), Vec3(1, 1, 1), Vec3(1, -1, 1), Vec3(-1, -1, 1)};
 
-  struct Triangle {
-    int va, vb, vc;
-    Color color;
-  };
-  Triangle cube_ts[12] = {
+  core::Mesh cube_mesh = core::Mesh::create_cube();
+  cube_mesh.triangle_colors = {
       // (-z) red
-      {0, 1, 2, make_color(255, 0, 0)},
-      {0, 2, 3, make_color(255, 0, 0)},
+      make_color(255, 0, 0),
+      make_color(255, 0, 0),
 
       // (+z) green
-      {4, 6, 5, make_color(0, 255, 0)},
-      {4, 7, 6, make_color(0, 255, 0)},
+      make_color(0, 255, 0),
+      make_color(0, 255, 0),
 
       // (-x) blue
-      {0, 3, 7, make_color(0, 0, 255)},
-      {0, 7, 4, make_color(0, 0, 255)},
+      make_color(0, 0, 255),
+      make_color(0, 0, 255),
 
       // (+x) yellow
-      {1, 5, 6, make_color(255, 255, 0)},
-      {1, 6, 2, make_color(255, 255, 0)},
+      make_color(255, 255, 0),
+      make_color(255, 255, 0),
 
       // (-y) qing
-      {0, 4, 5, make_color(0, 255, 255)},
-      {0, 5, 1, make_color(0, 255, 255)},
+      make_color(0, 255, 255),
+      make_color(0, 255, 255),
 
       // (+y) yang_hong
-      {3, 2, 6, make_color(255, 0, 255)},
-      {3, 6, 7, make_color(255, 0, 255)},
+      make_color(255, 0, 255),
+      make_color(255, 0, 255),
   };
 
   platform::Sdl_Texture fb_texture;
@@ -153,15 +147,7 @@ int main() {
     mat4 model(1.f);
     mat4 mvp = camera.mvp_matrix(model);
 
-    for (const Triangle &tri : cube_ts) {
-      renderer.draw_triangle(cube_vs[tri.va], cube_vs[tri.vb], cube_vs[tri.vc],
-                             mvp, tri.color);
-    }
-
-    // Vec3 v0(250, 100, 0);
-    // Vec3 v1(100, 400, 0);
-    // Vec3 v2(400, 400, 0);
-    // rasterizer.draw_filled_triangle(v0, v1, v2, make_color(255, 0, 0));
+    renderer.draw_mesh(cube_mesh, mvp);
 
     fb_texture.update(rasterizer.frame_buffer());
 

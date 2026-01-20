@@ -37,6 +37,9 @@ add_library(core STATIC
 	${CMAKE_SOURCE_DIR}/src/core/math_utils.cpp
 	${CMAKE_SOURCE_DIR}/src/core/camera.cpp
 	${CMAKE_SOURCE_DIR}/src/core/renderer.cpp
+	${CMAKE_SOURCE_DIR}/src/core/mesh.cpp
+	${CMAKE_SOURCE_DIR}/src/core/mesh_loarder.cpp
+
 )
 target_include_directories(core PUBLIC
 	${CMAKE_SOURCE_DIR}/src/core

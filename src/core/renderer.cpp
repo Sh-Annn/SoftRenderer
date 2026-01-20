@@ -31,6 +31,28 @@ void Renderer::draw_triangle(const Vec3 &va, const Vec3 &vb, const Vec3 &vc,
   m_rasterizer->draw_filled_triangle(screen0, screen1, screen2, color);
 }
 
+void Renderer::draw_mesh(const Mesh &mesh, const mat4 &mvp) {
+  for (int i = 0; i < mesh.triangle_count(); i++) {
+    int i0, i1, i2;
+    mesh.get_triangle_indices(i, i0, i1, i2);
+
+    const Vec3 &v0 = mesh.positions[i0];
+    const Vec3 &v1 = mesh.positions[i1];
+    const Vec3 &v2 = mesh.positions[i2];
+
+    Color color;
+    if (mesh.use_triangle_colors()) {
+      color = mesh.triangle_colors[i];
+    } else if (mesh.use_vertex_colors()) {
+      color = mesh.vertex_colors[i0];
+    } else {
+      color = 0xFFFFFFFF;
+    }
+
+    draw_triangle(v0, v1, v2, mvp, color);
+  }
+}
+
 void Renderer::set_viewport(int width, int height) {
   m_viewport_width = width;
   m_viewport_height = height;

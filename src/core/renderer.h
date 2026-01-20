@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../types.h"
+#include "mesh.h"
 #include "rasterizer.h"
 
 namespace core {
@@ -10,6 +11,7 @@ public:
 
   void draw_triangle(const Vec3 &va, const Vec3 &vb, const Vec3 &vc,
                      const mat4 &mvp, Color color);
+  void draw_mesh(const Mesh &mesh, const mat4 &mvp);
 
   void set_viewport(int width, int height);
 
