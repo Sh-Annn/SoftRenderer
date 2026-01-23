@@ -26,7 +26,7 @@ target_include_directories(imgui PUBLIC
 	${IMGUI_DIR}
 	${IMGUI_DIR}/backends
 	${SDL2_INCLUDE_DIRS}
-	${CMAKE_SOURCE_DIR}/src
+	# ${CMAKE_SOURCE_DIR}/src
 )
 
 target_compile_options(imgui PRIVATE ${SDL2_CFLAGS_OTHER})
@@ -85,6 +85,7 @@ target_compile_options(ui PRIVATE ${SDL2_CFLAGS_OTHER})
 # main ------------------------------------------------------
 add_executable(soft_renderer
 	src/main.cpp
+	src/app.cpp
 	# src/app/app.cpp
 )
 target_include_directories(soft_renderer PRIVATE
