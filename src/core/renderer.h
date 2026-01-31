@@ -12,6 +12,8 @@ public:
 
   // void draw_triangle(const Vec3 &va, const Vec3 &vb, const Vec3 &vc,
   //                    const mat4 &mvp, Color color);
+  // void draw_mesh(const Mesh &mesh, const mat4 &mvp,
+  //                const Texture *texture = nullptr);
   void draw_mesh(const Mesh &mesh, const mat4 &mvp,
                  const Texture *texture = nullptr);
 

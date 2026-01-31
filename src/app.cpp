@@ -27,11 +27,10 @@ bool App::init(const char *title, int window_width, int window_height) {
   m_camera.set_perspective(45.f, (float)RD_WIDTH / RD_HEIGHT, 0.1f, 100.f);
   m_camera.sync_orthographic_to_perspective(4.f);
 
-  m_mesh = core::MeshLoader::load_obj("../obj/diablo3_pose/diablo3_pose.obj",
+  m_mesh = core::MeshLoader::load_obj("../obj/african_head/african_head.obj",
                                       0xFF80FF);
 
-  if (!core::TextureLoader::load("../obj/diablo3_pose/diablo3_pose_diffuse.tga",
-                                 m_texture)) {
+  if (!core::TextureLoader::load("../obj/floor_diffuse.tga", m_texture)) {
     std::cerr << "Failed to load diffuse texture!\n";
     return false;
   }
@@ -157,6 +156,7 @@ void App::render() {
   mat4 mvp = m_camera.mvp_matrix(model);
 
   m_renderer->draw_mesh(m_mesh, mvp, &m_texture);
+  // m_renderer->draw_mesh(m_mesh, mvp);
 
   m_fb_texture.update(m_rasterizer.frame_buffer());
 

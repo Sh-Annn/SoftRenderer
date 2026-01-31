@@ -1,9 +1,24 @@
 #include "rasterizer.h"
 
 #include <algorithm>
-#include <utility>
+#include <glm/geometric.hpp>
 
 namespace core {
+// Vec3 fragment(Vec3 n, Vec3 pos) {
+//   Vec3 kd = {0.79, 0.79, 0.79};
+//   Vec3 light = {-20, 20, 0};
+//
+//   Vec3 l = glm::normalize(light - pos);
+//
+//   float r_2 = glm::dot((pos - light), (pos - light));
+//
+//   Vec3 ls = kd * (glm::normalize(light) / r_2) * std::max(0.f, glm::dot(n,
+//   l));
+//
+//   Vec3 result = ls;
+//
+//   return result;
+// }
 void Rasterizer::Init(int width, int height) {
   w_ = width;
   h_ = height;
@@ -55,58 +70,22 @@ float Rasterizer::signed_triangle_area(const Vec3 &a, const Vec3 &b,
                 (a.y - c.y) * (a.x + c.x));
 }
 
-// void Rasterizer::draw_filled_triangle(const Vec3 &pa, const Vec3 &pb,
-//                                       const Vec3 &pc, Color color) {
-//   if (!valid()) {
-//     return;
-//   }
-//
-//   int min_x = (int)std::floor(std::min({pa.x, pb.x, pc.x}));
-//   int min_y = (int)std::floor(std::min({pa.y, pb.y, pc.y}));
-//   int max_x = (int)std::floor(std::max({pa.x, pb.x, pc.x}));
-//   int max_y = (int)std::floor(std::max({pa.y, pb.y, pc.y}));
-//
-//   min_x = std::max(min_x, 0);
-//   min_y = std::max(min_y, 0);
-//   max_x = std::min(max_x, w_ - 1);
-//   max_y = std::min(max_y, h_ - 1);
-//
-//   float area = signed_triangle_area(pa, pb, pc);
-//   if (std::abs(area) < 1e-6f) {
-//     return;
-//   }
-//   for (int y = min_y; y <= max_y; ++y) {
-//     for (int x = min_x; x <= max_x; ++x) {
-//       float alpha = signed_triangle_area({x, y, 0}, pb, pc) / area;
-//       float beta = signed_triangle_area({x, y, 0}, pc, pa) / area;
-//       float gama = signed_triangle_area({x, y, 0}, pa, pb) / area;
-//       if (alpha >= 0 && beta >= 0 && gama >= 0) {
-//         float depth = alpha * pa.z + beta * pb.z + gama * pc.z;
-//
-//         int idx = y * w_ + x;
-//
-//         if (m_depth_test_enabled) {
-//           if (depth < depth_buf[idx]) {
-//             frame_buf[idx] = color;
-//             depth_buf[idx] = depth;
-//           }
-//         } else {
-//           frame_buf[idx] = color;
-//         }
-//       }
-//     }
-//   }
-// }
-
-void Rasterizer::draw_filled_triangle(const Vec3 &sa, const Vec3 &sb,
-                                      const Vec3 &sc, const Vec2 &uv0,
-                                      const Vec2 &uv1, const Vec2 &uv2,
-                                      float w0, float w1, float w2,
-                                      const Texture *texture,
+// void Rasterizer::draw_filled_triangle(const Vec3 &sa, const Vec3 &sb,
+//                                       const Vec3 &sc, const Vec2 &uv0,
+//                                       const Vec2 &uv1, const Vec2 &uv2,
+//                                       float w0, float w1, float w2,
+//                                       const Texture *texture,
+//                                       Color fallback_color) {
+void Rasterizer::draw_filled_triangle(const Vertex &v0, const Vertex &v1,
+                                      const Vertex &v2, const Texture *texture,
                                       Color fallback_color) {
   if (!valid()) {
     return;
   }
+
+  const Vec3 &sa = v0.pos;
+  const Vec3 &sb = v1.pos;
+  const Vec3 &sc = v2.pos;
 
   int min_x = (int)std::floor(std::min({sa.x, sb.x, sc.x}));
   int min_y = (int)std::floor(std::min({sa.y, sb.y, sc.y}));
@@ -123,9 +102,9 @@ void Rasterizer::draw_filled_triangle(const Vec3 &sa, const Vec3 &sb,
     return;
   }
 
-  float inv_w0 = 1.f / w0;
-  float inv_w1 = 1.f / w1;
-  float inv_w2 = 1.f / w2;
+  float inv_w0 = 1.f / v0.w;
+  float inv_w1 = 1.f / v1.w;
+  float inv_w2 = 1.f / v2.w;
 
   for (int y = min_y; y <= max_y; ++y) {
     for (int x = min_x; x <= max_x; ++x) {
@@ -144,13 +123,12 @@ void Rasterizer::draw_filled_triangle(const Vec3 &sa, const Vec3 &sb,
 
           if (texture && texture->valid()) {
             float inv_w = alpha * inv_w0 + beta * inv_w1 + gama * inv_w2;
-            float u = (alpha * uv0.x * inv_w0 + beta * uv1.x * inv_w1 +
-                       gama * uv2.x * inv_w2) /
+            float u = (alpha * v0.uv.x * inv_w0 + beta * v1.uv.x * inv_w1 +
+                       gama * v2.uv.x * inv_w2) /
                       inv_w;
-            float v = (alpha * uv0.y * inv_w0 + beta * uv1.y * inv_w1 +
-                       gama * uv2.y * inv_w2) /
+            float v = (alpha * v0.uv.y * inv_w0 + beta * v1.uv.y * inv_w1 +
+                       gama * v2.uv.y * inv_w2) /
                       inv_w;
-
             color = texture->sample(u, v);
           } else {
             color = fallback_color;

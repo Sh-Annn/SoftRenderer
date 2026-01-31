@@ -3,6 +3,7 @@
 #include "../types.h"
 
 #include "texture.h"
+#include "vertex.h"
 
 namespace core {
 class Rasterizer {
@@ -15,10 +16,17 @@ public:
   void draw_line(Vec3 &a, Vec3 &b, Color color);
   // void draw_filled_triangle(const Vec3 &a, const Vec3 &b, const Vec3 &c,
   //                           Color color);
-  void draw_filled_triangle(const Vec3 &sa, const Vec3 &sb, const Vec3 &sc,
-                            const Vec2 &uv0, const Vec2 &uv1, const Vec2 &uv2,
-                            float w0, float w1, float w2,
-                            const Texture *texture, Color fallback_color);
+  // void draw_filled_triangle(const Vec3 &sa, const Vec3 &sb, const Vec3 &sc,
+  //                           const Vec2 &uv0, const Vec2 &uv1, const Vec2
+  //                           &uv2, float w0, float w1, float w2, const Texture
+  //                           *texture, Color fallback_color);
+  // void draw_filled_triangle(const Vec3 &sa, const Vec3 &sb, const Vec3 &sc,
+  //                           const Vec2 &uv0, const Vec2 &uv1, const Vec2
+  //                           &uv2, float w0, float w1, float w2, Color
+  //                           fallback_color);
+  void draw_filled_triangle(const Vertex &v0, const Vertex &v1,
+                            const Vertex &v2, const Texture *texture,
+                            Color fallback_color);
   float signed_triangle_area(const Vec3 &a, const Vec3 &b, const Vec3 &c);
 
   std::vector<Color> &frame_buffer() { return frame_buf; }

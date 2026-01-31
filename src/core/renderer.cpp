@@ -7,31 +7,8 @@ Renderer::Renderer(Rasterizer *rasterizer, int viewport_width,
     : m_rasterizer(rasterizer), m_viewport_width(viewport_width),
       m_viewport_height(viewport_height) {}
 
-// void Renderer::draw_triangle(const Vec3 &va, const Vec3 &vb, const Vec3 &vc,
-//                              const mat4 &mvp, Color color) {
-//   // world => clip (apply mvp)
-//   Vec4 clip0 = mvp * Vec4(va, 1.f);
-//   Vec4 clip1 = mvp * Vec4(vb, 1.f);
-//   Vec4 clip2 = mvp * Vec4(vc, 1.f);
-//
-//   if (clip0.w <= 0.f || clip1.w <= 0.f || clip2.w <= 0.f) {
-//     return;
-//   }
-//
-//   // clip => NDC
-//   Vec3 ndc0 = perspective_divide(clip0);
-//   Vec3 ndc1 = perspective_divide(clip1);
-//   Vec3 ndc2 = perspective_divide(clip2);
-//
-//   // NDC => SCREEN
-//   Vec3 screen0 = viewport_transform(ndc0);
-//   Vec3 screen1 = viewport_transform(ndc1);
-//   Vec3 screen2 = viewport_transform(ndc2);
-//
-//   // Rasterizer
-//   m_rasterizer->draw_filled_triangle(screen0, screen1, screen2, color);
-// }
-
+// void Renderer::draw_mesh(const Mesh &mesh, const mat4 &mvp,
+//                          const Texture *texture) {
 void Renderer::draw_mesh(const Mesh &mesh, const mat4 &mvp,
                          const Texture *texture) {
   for (int i = 0; i < mesh.triangle_count(); i++) {
@@ -74,8 +51,14 @@ void Renderer::draw_mesh(const Mesh &mesh, const mat4 &mvp,
       fallback_color = mesh.vertex_colors[i0];
     }
 
-    m_rasterizer->draw_filled_triangle(screen0, screen1, screen2, uv0, uv1, uv2,
-                                       clip0.w, clip1.w, clip2.w, texture,
+    // m_rasterizer->draw_filled_triangle(screen0, screen1, screen2, uv0, uv1,
+    // uv2,
+    //                                    clip0.w, clip1.w, clip2.w, texture,
+    //                                    fallback_color);
+    Vertex vert0 = {screen0, uv0, clip0.w};
+    Vertex vert1 = {screen1, uv1, clip1.w};
+    Vertex vert2 = {screen2, uv2, clip2.w};
+    m_rasterizer->draw_filled_triangle(vert0, vert1, vert2, texture,
                                        fallback_color);
   }
 }

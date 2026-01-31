@@ -18,7 +18,7 @@ void Camera::move_forward(float distance) {
   m_position += m_forward * distance;
 }
 void Camera::move_right(float distance) { m_position += m_right * distance; }
-void Camera::move_up(float distance) { m_position += m_up * distance; }
+void Camera::move_up(float distance) { m_position += Vec3(0, 1, 0) * distance; }
 
 /*
  * pitch_delta => left - right
