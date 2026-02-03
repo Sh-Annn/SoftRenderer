@@ -185,6 +185,9 @@ void draw(SDL_Texture *framebuffer_tex, AppState &state) {
     //         "Depth test disabled - triangles may overlap incorrectly");
     //   }
     // }
+
+    ImGui::Separator();
+    ImGui::Checkbox("texture enabled", &state.texture_enabled);
   }
 
   ImGui::PopFont();

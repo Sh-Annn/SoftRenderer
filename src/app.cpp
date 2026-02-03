@@ -126,11 +126,13 @@ void App::sync_state() {
     m_camera.set_projection_type(core_proj);
   }
 
+  // rasterizer settings
   // depth test
   m_rasterizer.set_depth_test_enabled(m_app_state.depth_test_enabled);
-
   // persp_interp
   m_rasterizer.set_persp_interp_enabled(m_app_state.persp_interp);
+  // texture
+  m_rasterizer.set_texture_enabled(m_app_state.texture_enabled);
 
   if (m_app_state.request_camera_reset) {
     m_camera.reset();

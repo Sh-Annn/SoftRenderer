@@ -26,8 +26,10 @@ public:
   void set_persp_interp_enabled(bool enabled) {
     m_persp_interp_enabled = enabled;
   }
+  void set_texture_enabled(bool enabled) { m_texture_enabled = enabled; }
   bool is_depth_test_enabled() const { return m_depth_test_enabled; }
   bool is_persp_interp_enabled() const { return m_persp_interp_enabled; }
+  bool is_texture_enabled() const { return m_texture_enabled; }
 
 private:
   std::vector<Color> frame_buf;
@@ -36,6 +38,7 @@ private:
   int h_ = 0;
   bool m_depth_test_enabled = true;
   bool m_persp_interp_enabled = true;
+  bool m_texture_enabled = true;
 
   bool valid() const { return w_ > 0 && h_ > 0; }
 };

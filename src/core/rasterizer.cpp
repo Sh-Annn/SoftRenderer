@@ -117,7 +117,7 @@ void Rasterizer::draw_filled_triangle(const Vertex &v0, const Vertex &v1,
         if (pass_depth) {
           Color color = fallback_color;
 
-          if (texture && texture->valid()) {
+          if (m_texture_enabled && texture && texture->valid()) {
             float u, v;
 
             if (m_persp_interp_enabled) {

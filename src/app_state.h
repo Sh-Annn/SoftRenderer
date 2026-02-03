@@ -20,4 +20,6 @@ struct AppState {
   bool request_camera_reset = false;
 
   bool persp_interp = true;
+
+  bool texture_enabled = true;
 };
