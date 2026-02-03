@@ -18,4 +18,6 @@ struct AppState {
   float camera_yaw = -90.f;
 
   bool request_camera_reset = false;
+
+  bool persp_interp = true;
 };

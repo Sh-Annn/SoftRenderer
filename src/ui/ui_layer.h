@@ -5,10 +5,6 @@ struct AppState;
 
 namespace ui {
 
-struct UiState {
-  bool depth_test_enabled = true;
-};
-
 bool init(SDL_Window *window, SDL_Renderer *renderer);
 void shutdown();
 

@@ -27,8 +27,7 @@ bool App::init(const char *title, int window_width, int window_height) {
   m_camera.set_perspective(45.f, (float)RD_WIDTH / RD_HEIGHT, 0.1f, 100.f);
   m_camera.sync_orthographic_to_perspective(4.f);
 
-  m_mesh = core::MeshLoader::load_obj("../obj/african_head/african_head.obj",
-                                      0xFF80FF);
+  m_mesh = core::MeshLoader::load_obj("../obj/floor.obj", 0xFF80FF);
 
   if (!core::TextureLoader::load("../obj/floor_diffuse.tga", m_texture)) {
     std::cerr << "Failed to load diffuse texture!\n";
@@ -129,6 +128,9 @@ void App::sync_state() {
 
   // depth test
   m_rasterizer.set_depth_test_enabled(m_app_state.depth_test_enabled);
+
+  // persp_interp
+  m_rasterizer.set_persp_interp_enabled(m_app_state.persp_interp);
 
   if (m_app_state.request_camera_reset) {
     m_camera.reset();

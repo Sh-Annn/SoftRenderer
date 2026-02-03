@@ -102,10 +102,6 @@ void Rasterizer::draw_filled_triangle(const Vertex &v0, const Vertex &v1,
     return;
   }
 
-  float inv_w0 = 1.f / v0.w;
-  float inv_w1 = 1.f / v1.w;
-  float inv_w2 = 1.f / v2.w;
-
   for (int y = min_y; y <= max_y; ++y) {
     for (int x = min_x; x <= max_x; ++x) {
       float alpha = signed_triangle_area({x, y, 0}, sb, sc) / area;
@@ -119,17 +115,32 @@ void Rasterizer::draw_filled_triangle(const Vertex &v0, const Vertex &v1,
         bool pass_depth = !m_depth_test_enabled || (depth < depth_buf[idx]);
 
         if (pass_depth) {
-          Color color;
+          Color color = fallback_color;
 
           if (texture && texture->valid()) {
-            float inv_w = alpha * inv_w0 + beta * inv_w1 + gama * inv_w2;
-            float u = (alpha * v0.uv.x * inv_w0 + beta * v1.uv.x * inv_w1 +
-                       gama * v2.uv.x * inv_w2) /
-                      inv_w;
-            float v = (alpha * v0.uv.y * inv_w0 + beta * v1.uv.y * inv_w1 +
-                       gama * v2.uv.y * inv_w2) /
-                      inv_w;
+            float u, v;
+
+            if (m_persp_interp_enabled) {
+
+              float inv_w0 = 1.f / v0.w;
+              float inv_w1 = 1.f / v1.w;
+              float inv_w2 = 1.f / v2.w;
+              float inv_w = alpha * inv_w0 + beta * inv_w1 + gama * inv_w2;
+
+              u = (alpha * v0.uv.x * inv_w0 + beta * v1.uv.x * inv_w1 +
+                   gama * v2.uv.x * inv_w2) /
+                  inv_w;
+              v = (alpha * v0.uv.y * inv_w0 + beta * v1.uv.y * inv_w1 +
+                   gama * v2.uv.y * inv_w2) /
+                  inv_w;
+
+            } else {
+              u = alpha * v0.uv.x + beta * v1.uv.x + gama * v2.uv.x;
+              v = alpha * v0.uv.y + beta * v1.uv.y + gama * v2.uv.y;
+            }
+
             color = texture->sample(u, v);
+
           } else {
             color = fallback_color;
           }
@@ -139,8 +150,8 @@ void Rasterizer::draw_filled_triangle(const Vertex &v0, const Vertex &v1,
           if (m_depth_test_enabled) {
             depth_buf[idx] = depth;
           }
-        }
-      }
+        } // depth test
+      } // barycentric coordinates
     }
   }
 }

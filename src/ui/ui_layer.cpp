@@ -174,6 +174,17 @@ void draw(SDL_Texture *framebuffer_tex, AppState &state) {
             "Depth test disabled - triangles may overlap incorrectly");
       }
     }
+
+    ImGui::Separator();
+    ImGui::Checkbox("perspctive interp", &state.persp_interp);
+    // if (!state.depth_test_enabled) {
+    //   ImGui::SameLine();
+    //   ImGui::TextColored(ImVec4(1, 0.5f, 0, 1), "(!)");
+    //   if (ImGui::IsItemHovered()) {
+    //     ImGui::SetTooltip(
+    //         "Depth test disabled - triangles may overlap incorrectly");
+    //   }
+    // }
   }
 
   ImGui::PopFont();
