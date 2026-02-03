@@ -64,6 +64,8 @@ void Camera::reset() {
 
   m_pitch = math::degrees(asin(m_forward.y));
   m_yaw = math::degrees(atan2(m_forward.z, m_forward.x));
+
+  m_fov = 45.f;
 }
 
 mat4 Camera::view_matrix() const {
