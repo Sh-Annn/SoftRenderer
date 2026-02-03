@@ -35,10 +35,12 @@ void Rasterizer::clear() {
 }
 
 void Rasterizer::put_pixel(int x, int y, Color color) {
-  frame_buf[y * w_ + x] = color;
+  if (x >= 0 && x < w_ && y >= 0 && y < h_) {
+    frame_buf[y * w_ + x] = color;
+  }
 }
 
-void Rasterizer::draw_line(Vec3 &a, Vec3 &b, Color color) {
+void Rasterizer::draw_line(Vec3 a, Vec3 b, Color color) {
   bool steep = std::abs(b.y - a.y) > std::abs(b.x - a.x);
   if (steep) {
     std::swap(a.x, a.y);
@@ -52,6 +54,9 @@ void Rasterizer::draw_line(Vec3 &a, Vec3 &b, Color color) {
   int y = a.y;
   int ierror = 0;
   for (int x = a.x; x < b.x; ++x) {
+    // if ((x > w_ || x < w_) || (y > h_ || y < h_)) {
+    //   continue;
+    // }
     if (steep) {
       put_pixel(y, x, color);
     } else {
@@ -70,12 +75,6 @@ float Rasterizer::signed_triangle_area(const Vec3 &a, const Vec3 &b,
                 (a.y - c.y) * (a.x + c.x));
 }
 
-// void Rasterizer::draw_filled_triangle(const Vec3 &sa, const Vec3 &sb,
-//                                       const Vec3 &sc, const Vec2 &uv0,
-//                                       const Vec2 &uv1, const Vec2 &uv2,
-//                                       float w0, float w1, float w2,
-//                                       const Texture *texture,
-//                                       Color fallback_color) {
 void Rasterizer::draw_filled_triangle(const Vertex &v0, const Vertex &v1,
                                       const Vertex &v2, const Texture *texture,
                                       Color fallback_color) {

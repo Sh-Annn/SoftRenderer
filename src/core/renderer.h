@@ -5,16 +5,14 @@
 #include "rasterizer.h"
 #include "texture.h"
 
+struct AppState;
+
 namespace core {
 class Renderer {
 public:
   Renderer(Rasterizer *rasterizer, int viewport_width, int viewport_height);
 
-  // void draw_triangle(const Vec3 &va, const Vec3 &vb, const Vec3 &vc,
-  //                    const mat4 &mvp, Color color);
-  // void draw_mesh(const Mesh &mesh, const mat4 &mvp,
-  //                const Texture *texture = nullptr);
-  void draw_mesh(const Mesh &mesh, const mat4 &mvp,
+  void draw_mesh(const Mesh &mesh, const mat4 &mvp, const AppState &state,
                  const Texture *texture = nullptr);
 
   void set_viewport(int width, int height);

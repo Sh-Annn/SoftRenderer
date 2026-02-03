@@ -13,7 +13,7 @@ public:
   void clear();
 
   void put_pixel(int x, int y, Color color);
-  void draw_line(Vec3 &a, Vec3 &b, Color color);
+  void draw_line(Vec3 a, Vec3 b, Color color);
   void draw_filled_triangle(const Vertex &v0, const Vertex &v1,
                             const Vertex &v2, const Texture *texture,
                             Color fallback_color);

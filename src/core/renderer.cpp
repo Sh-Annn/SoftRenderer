@@ -1,5 +1,8 @@
 #include "renderer.h"
 #include "texture.h"
+#include <SDL2/SDL_keycode.h>
+
+#include "../app_state.h"
 
 namespace core {
 Renderer::Renderer(Rasterizer *rasterizer, int viewport_width,
@@ -7,10 +10,8 @@ Renderer::Renderer(Rasterizer *rasterizer, int viewport_width,
     : m_rasterizer(rasterizer), m_viewport_width(viewport_width),
       m_viewport_height(viewport_height) {}
 
-// void Renderer::draw_mesh(const Mesh &mesh, const mat4 &mvp,
-//                          const Texture *texture) {
 void Renderer::draw_mesh(const Mesh &mesh, const mat4 &mvp,
-                         const Texture *texture) {
+                         const AppState &state, const Texture *texture) {
   for (int i = 0; i < mesh.triangle_count(); i++) {
     int i0, i1, i2;
     mesh.get_triangle_indices(i, i0, i1, i2);
@@ -51,15 +52,28 @@ void Renderer::draw_mesh(const Mesh &mesh, const mat4 &mvp,
       fallback_color = mesh.vertex_colors[i0];
     }
 
-    // m_rasterizer->draw_filled_triangle(screen0, screen1, screen2, uv0, uv1,
-    // uv2,
-    //                                    clip0.w, clip1.w, clip2.w, texture,
-    //                                    fallback_color);
-    Vertex vert0 = {screen0, uv0, clip0.w};
-    Vertex vert1 = {screen1, uv1, clip1.w};
-    Vertex vert2 = {screen2, uv2, clip2.w};
-    m_rasterizer->draw_filled_triangle(vert0, vert1, vert2, texture,
-                                       fallback_color);
+    switch (state.render_mode) {
+    case RenderMode::Solid: {
+      Vertex vert0 = {screen0, uv0, clip0.w};
+      Vertex vert1 = {screen1, uv1, clip1.w};
+      Vertex vert2 = {screen2, uv2, clip2.w};
+      m_rasterizer->draw_filled_triangle(vert0, vert1, vert2, texture,
+                                         fallback_color);
+      break;
+    }
+    case RenderMode::Vertex: {
+      m_rasterizer->put_pixel(screen0.x, screen0.y, fallback_color);
+      m_rasterizer->put_pixel(screen1.x, screen1.y, fallback_color);
+      m_rasterizer->put_pixel(screen2.x, screen2.y, fallback_color);
+      break;
+    }
+    case RenderMode::WireFrame: {
+      m_rasterizer->draw_line(screen0, screen1, fallback_color);
+      m_rasterizer->draw_line(screen1, screen2, fallback_color);
+      m_rasterizer->draw_line(screen2, screen0, fallback_color);
+      break;
+    }
+    } // switch RenderMode
   }
 }
 
