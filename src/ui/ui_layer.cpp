@@ -177,6 +177,10 @@ void draw(SDL_Texture *framebuffer_tex, AppState &state) {
 
     ImGui::Separator();
     ImGui::Checkbox("perspctive interp", &state.persp_interp);
+
+    ImGui::Separator();
+    ImGui::Checkbox("texture enabled", &state.texture_enabled);
+
     // if (!state.depth_test_enabled) {
     //   ImGui::SameLine();
     //   ImGui::TextColored(ImVec4(1, 0.5f, 0, 1), "(!)");
@@ -185,9 +189,6 @@ void draw(SDL_Texture *framebuffer_tex, AppState &state) {
     //         "Depth test disabled - triangles may overlap incorrectly");
     //   }
     // }
-
-    ImGui::Separator();
-    ImGui::Checkbox("texture enabled", &state.texture_enabled);
   }
 
   ImGui::PopFont();

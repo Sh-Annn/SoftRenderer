@@ -33,8 +33,8 @@ public:
 private:
   void handle_input();
 
-  static constexpr int RD_WIDTH = 500;
-  static constexpr int RD_HEIGHT = 500;
+  static constexpr int RD_WIDTH = 900;
+  static constexpr int RD_HEIGHT = 600;
   static constexpr float MOVE_SPEED = 0.05f;
   static constexpr float ROTATE_SPEED = 0.2f;
 

@@ -31,6 +31,8 @@ void Renderer::draw_mesh(const Mesh &mesh, const mat4 &mvp,
     Vec4 clip1 = mvp * Vec4(v1, 1.f);
     Vec4 clip2 = mvp * Vec4(v2, 1.f);
 
+    // +z ----- -z
+    // point ----- camera
     if (clip0.w <= 0.f || clip1.w <= 0.f || clip2.w <= 0.f) {
       continue;
     }

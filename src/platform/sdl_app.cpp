@@ -10,9 +10,8 @@ bool SdlApp::init(const char *title, int w, int h) {
   }
 
   // create Window and Renderer
-  m_window =
-      SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w,
-                       h, SDL_WINDOW_RESIZABLE);
+  m_window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED,
+                              SDL_WINDOWPOS_CENTERED, w, h, SDL_WINDOW_SHOWN);
   if (!m_window) {
     std::cerr << "SDL_CreateWindow failed: " << SDL_GetError() << '\n';
     return false;

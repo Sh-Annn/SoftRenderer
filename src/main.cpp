@@ -3,7 +3,7 @@
 int main() {
   App app;
 
-  if (!app.init("Soft Renderer", 900, 600)) {
+  if (!app.init("Soft Renderer", 1300, 600)) {
     return 1;
   }
 

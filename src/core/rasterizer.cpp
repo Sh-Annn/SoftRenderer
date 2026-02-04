@@ -1,4 +1,5 @@
 #include "rasterizer.h"
+#include "math_utils.h"
 
 #include <algorithm>
 #include <glm/geometric.hpp>
@@ -54,9 +55,9 @@ void Rasterizer::draw_line(Vec3 a, Vec3 b, Color color) {
   int y = a.y;
   int ierror = 0;
   for (int x = a.x; x < b.x; ++x) {
-    // if ((x > w_ || x < w_) || (y > h_ || y < h_)) {
-    //   continue;
-    // }
+    float t = (float)(x - a.x) / (b.x - a.x);
+    float curr_z = math::lerp(a.z, b.z, t);
+    int idx = y * w_ + x;
     if (steep) {
       put_pixel(y, x, color);
     } else {
