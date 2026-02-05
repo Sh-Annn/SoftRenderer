@@ -1,4 +1,5 @@
 #include "rasterizer.h"
+#include "../color.h"
 #include "math_utils.h"
 
 #include <algorithm>
@@ -78,7 +79,8 @@ float Rasterizer::signed_triangle_area(const Vec3 &a, const Vec3 &b,
 
 void Rasterizer::draw_filled_triangle(const Vertex &v0, const Vertex &v1,
                                       const Vertex &v2, const Texture *texture,
-                                      Color fallback_color) {
+                                      Color fallback_color,
+                                      const Vec3 &view_pos) {
   if (!valid()) {
     return;
   }
@@ -102,6 +104,18 @@ void Rasterizer::draw_filled_triangle(const Vertex &v0, const Vertex &v1,
     return;
   }
 
+  float inv_w0 = 1.f / v0.w;
+  float inv_w1 = 1.f / v1.w;
+  float inv_w2 = 1.f / v2.w;
+
+  // Phong Lighting parameters (Constant for the frame/triangle in this simple
+  // implementation)
+  const Vec3 light_pos = {2.0f, 2.0f, 2.0f};
+  const Vec3 light_color = {1.0f, 1.0f, 1.0f};
+  const float Ia = 0.5f;
+  const float Is = 3.f;
+  const Vec3 ambient = Ia * light_color;
+
   for (int y = min_y; y <= max_y; ++y) {
     for (int x = min_x; x <= max_x; ++x) {
       float alpha = signed_triangle_area({x, y, 0}, sb, sc) / area;
@@ -117,15 +131,12 @@ void Rasterizer::draw_filled_triangle(const Vertex &v0, const Vertex &v1,
         if (pass_depth) {
           Color color = fallback_color;
 
+          float inv_w = alpha * inv_w0 + beta * inv_w1 + gama * inv_w2;
+
           if (m_texture_enabled && texture && texture->valid()) {
             float u, v;
 
             if (m_persp_interp_enabled) {
-
-              float inv_w0 = 1.f / v0.w;
-              float inv_w1 = 1.f / v1.w;
-              float inv_w2 = 1.f / v2.w;
-              float inv_w = alpha * inv_w0 + beta * inv_w1 + gama * inv_w2;
 
               u = (alpha * v0.uv.x * inv_w0 + beta * v1.uv.x * inv_w1 +
                    gama * v2.uv.x * inv_w2) /
@@ -143,6 +154,35 @@ void Rasterizer::draw_filled_triangle(const Vertex &v0, const Vertex &v1,
 
           } else {
             color = fallback_color;
+          }
+
+          if (m_light_enabled) {
+            Vec3 p_world_pos =
+                (alpha * v0.world_pos * inv_w0 + beta * v1.world_pos * inv_w1 +
+                 gama * v2.world_pos * inv_w2) /
+                inv_w;
+            Vec3 p_normal =
+                (alpha * v0.normal * inv_w0 + beta * v1.normal * inv_w1 +
+                 gama * v2.normal * inv_w2) /
+                inv_w;
+            p_normal = glm::normalize(p_normal);
+
+            Vec3 object_color;
+            object_color.r = ((color >> 16) & 0xFF) / 255.f;
+            object_color.g = ((color >> 8) & 0xFF) / 255.f;
+            object_color.b = (color & 0xFF) / 255.f;
+
+            // Diffuse
+            Vec3 light_dir = glm::normalize(light_pos - p_world_pos);
+            float diff = std::max(glm::dot(p_normal, light_dir), 0.f);
+            Vec3 diffuse = diff * light_color;
+
+            // Result
+            Vec3 result = diffuse * object_color;
+            result = glm::clamp(result, 0.f, 1.f);
+
+            color = make_color((u8)(result.x * 255), (u8)(result.y * 255),
+                               (u8)(result.z * 255));
           }
 
           frame_buf[idx] = color;

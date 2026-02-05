@@ -12,7 +12,8 @@ class Renderer {
 public:
   Renderer(Rasterizer *rasterizer, int viewport_width, int viewport_height);
 
-  void draw_mesh(const Mesh &mesh, const mat4 &mvp, const AppState &state,
+  void draw_mesh(const Mesh &mesh, const mat4 &model, const mat4 &mvp,
+                 const Vec3 &view_pos, const AppState &state,
                  const Texture *texture = nullptr);
 
   void set_viewport(int width, int height);

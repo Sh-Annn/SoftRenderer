@@ -181,6 +181,9 @@ void draw(SDL_Texture *framebuffer_tex, AppState &state) {
     ImGui::Separator();
     ImGui::Checkbox("texture enabled", &state.texture_enabled);
 
+    ImGui::Separator();
+    ImGui::Checkbox("light enabled", &state.light_enabled);
+
     // if (!state.depth_test_enabled) {
     //   ImGui::SameLine();
     //   ImGui::TextColored(ImVec4(1, 0.5f, 0, 1), "(!)");

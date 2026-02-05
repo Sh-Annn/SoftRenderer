@@ -10,8 +10,9 @@ Renderer::Renderer(Rasterizer *rasterizer, int viewport_width,
     : m_rasterizer(rasterizer), m_viewport_width(viewport_width),
       m_viewport_height(viewport_height) {}
 
-void Renderer::draw_mesh(const Mesh &mesh, const mat4 &mvp,
-                         const AppState &state, const Texture *texture) {
+void Renderer::draw_mesh(const Mesh &mesh, const mat4 &model, const mat4 &mvp,
+                         const Vec3 &view_pos, const AppState &state,
+                         const Texture *texture) {
   for (int i = 0; i < mesh.triangle_count(); i++) {
     int i0, i1, i2;
     mesh.get_triangle_indices(i, i0, i1, i2);
@@ -19,6 +20,13 @@ void Renderer::draw_mesh(const Mesh &mesh, const mat4 &mvp,
     const Vec3 &v0 = mesh.positions[i0];
     const Vec3 &v1 = mesh.positions[i1];
     const Vec3 &v2 = mesh.positions[i2];
+
+    Vec3 n0(0, 0, 1), n1(0, 0, 1), n2(0, 0, 1);
+    if (mesh.has_normals()) {
+      n0 = mesh.normals[i0];
+      n1 = mesh.normals[i1];
+      n2 = mesh.normals[i2];
+    }
 
     Vec2 uv0(0, 0), uv1(0, 0), uv2(0, 0);
     if (mesh.has_texcoords()) {
@@ -36,6 +44,14 @@ void Renderer::draw_mesh(const Mesh &mesh, const mat4 &mvp,
     if (clip0.w <= 0.f || clip1.w <= 0.f || clip2.w <= 0.f) {
       continue;
     }
+
+    Vec3 world_pos0 = Vec3(model * Vec4(v0, 1.f));
+    Vec3 world_pos1 = Vec3(model * Vec4(v1, 1.f));
+    Vec3 world_pos2 = Vec3(model * Vec4(v2, 1.f));
+
+    Vec3 world_normal0 = glm::normalize(Vec3(model * Vec4(n0, 0.0f)));
+    Vec3 world_normal1 = glm::normalize(Vec3(model * Vec4(n1, 0.0f)));
+    Vec3 world_normal2 = glm::normalize(Vec3(model * Vec4(n2, 0.0f)));
 
     // clip => NDC
     Vec3 ndc0 = perspective_divide(clip0);
@@ -56,11 +72,11 @@ void Renderer::draw_mesh(const Mesh &mesh, const mat4 &mvp,
 
     switch (state.render_mode) {
     case RenderMode::Solid: {
-      Vertex vert0 = {screen0, uv0, clip0.w};
-      Vertex vert1 = {screen1, uv1, clip1.w};
-      Vertex vert2 = {screen2, uv2, clip2.w};
+      Vertex vert0 = {screen0, uv0, clip0.w, v0, world_normal0};
+      Vertex vert1 = {screen1, uv1, clip1.w, v1, world_normal1};
+      Vertex vert2 = {screen2, uv2, clip2.w, v2, world_normal2};
       m_rasterizer->draw_filled_triangle(vert0, vert1, vert2, texture,
-                                         fallback_color);
+                                         fallback_color, view_pos);
       break;
     }
     case RenderMode::Vertex: {

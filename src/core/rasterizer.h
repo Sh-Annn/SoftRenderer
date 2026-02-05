@@ -16,7 +16,7 @@ public:
   void draw_line(Vec3 a, Vec3 b, Color color);
   void draw_filled_triangle(const Vertex &v0, const Vertex &v1,
                             const Vertex &v2, const Texture *texture,
-                            Color fallback_color);
+                            Color fallback_color, const Vec3 &view_pos);
   float signed_triangle_area(const Vec3 &a, const Vec3 &b, const Vec3 &c);
 
   std::vector<Color> &frame_buffer() { return frame_buf; }
@@ -27,9 +27,12 @@ public:
     m_persp_interp_enabled = enabled;
   }
   void set_texture_enabled(bool enabled) { m_texture_enabled = enabled; }
+  void set_light_enabled(bool enabled) { m_light_enabled = enabled; }
+
   bool is_depth_test_enabled() const { return m_depth_test_enabled; }
   bool is_persp_interp_enabled() const { return m_persp_interp_enabled; }
   bool is_texture_enabled() const { return m_texture_enabled; }
+  bool is_light_enabled() const { return m_light_enabled; }
 
 private:
   std::vector<Color> frame_buf;
@@ -39,6 +42,7 @@ private:
   bool m_depth_test_enabled = true;
   bool m_persp_interp_enabled = true;
   bool m_texture_enabled = true;
+  bool m_light_enabled = true;
 
   bool valid() const { return w_ > 0 && h_ > 0; }
 };

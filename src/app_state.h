@@ -21,5 +21,7 @@ struct AppState {
 
   bool persp_interp = true;
 
-  bool texture_enabled = true;
+  bool texture_enabled = false;
+
+  bool light_enabled = true;
 };
