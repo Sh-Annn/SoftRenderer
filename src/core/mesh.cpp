@@ -65,9 +65,9 @@ Mesh Mesh::create_cube() {
   return mesh;
 }
 
-void Mesh::set_uniform_color(Color color) {
-  triangle_colors.clear();
-  triangle_colors.resize(triangle_count(), color);
-}
+// void Mesh::set_uniform_color(Color color) {
+//   triangle_colors.clear();
+//   triangle_colors.resize(triangle_count(), color);
+// }
 
 } // namespace core

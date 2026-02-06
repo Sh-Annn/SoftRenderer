@@ -45,30 +45,35 @@ void Renderer::draw_mesh(const Mesh &mesh, const mat4 &model, const mat4 &mvp,
       continue;
     }
 
-    Vec3 world_pos0 = Vec3(model * Vec4(v0, 1.f));
-    Vec3 world_pos1 = Vec3(model * Vec4(v1, 1.f));
-    Vec3 world_pos2 = Vec3(model * Vec4(v2, 1.f));
+    // Vec3 world_pos0 = Vec3(model * Vec4(v0, 1.f));
+    // Vec3 world_pos1 = Vec3(model * Vec4(v1, 1.f));
+    // Vec3 world_pos2 = Vec3(model * Vec4(v2, 1.f));
 
     Vec3 world_normal0 = glm::normalize(Vec3(model * Vec4(n0, 0.0f)));
     Vec3 world_normal1 = glm::normalize(Vec3(model * Vec4(n1, 0.0f)));
     Vec3 world_normal2 = glm::normalize(Vec3(model * Vec4(n2, 0.0f)));
 
     // clip => NDC
-    Vec3 ndc0 = perspective_divide(clip0);
-    Vec3 ndc1 = perspective_divide(clip1);
-    Vec3 ndc2 = perspective_divide(clip2);
+    // Vec3 ndc0 = perspective_divide(clip0);
+    // Vec3 ndc1 = perspective_divide(clip1);
+    // Vec3 ndc2 = perspective_divide(clip2);
 
     // NDC => SCREEN
-    Vec3 screen0 = viewport_transform(ndc0);
-    Vec3 screen1 = viewport_transform(ndc1);
-    Vec3 screen2 = viewport_transform(ndc2);
+    // Vec3 screen0 = viewport_transform(ndc0);
+    // Vec3 screen1 = viewport_transform(ndc1);
+    // Vec3 screen2 = viewport_transform(ndc2);
 
-    Color fallback_color = 0xFFFFFFFF;
-    if (mesh.use_triangle_colors()) {
-      fallback_color = mesh.triangle_colors[i];
-    } else if (mesh.use_vertex_colors()) {
-      fallback_color = mesh.vertex_colors[i0];
-    }
+    // clip => NDC => SCREEN
+    Vec3 screen0 = viewport_transform(perspective_divide(clip0));
+    Vec3 screen1 = viewport_transform(perspective_divide(clip1));
+    Vec3 screen2 = viewport_transform(perspective_divide(clip2));
+
+    // Color fallback_color = 0xFFFFFFFF;
+    // if (mesh.use_triangle_colors()) {
+    //   fallback_color = mesh.triangle_colors[i];
+    // } else if (mesh.use_vertex_colors()) {
+    //   fallback_color = mesh.vertex_colors[i0];
+    // }
 
     switch (state.render_mode) {
     case RenderMode::Solid: {
@@ -76,19 +81,19 @@ void Renderer::draw_mesh(const Mesh &mesh, const mat4 &model, const mat4 &mvp,
       Vertex vert1 = {screen1, uv1, clip1.w, v1, world_normal1};
       Vertex vert2 = {screen2, uv2, clip2.w, v2, world_normal2};
       m_rasterizer->draw_filled_triangle(vert0, vert1, vert2, texture,
-                                         fallback_color, view_pos);
+                                         view_pos);
       break;
     }
     case RenderMode::Vertex: {
-      m_rasterizer->put_pixel(screen0.x, screen0.y, fallback_color);
-      m_rasterizer->put_pixel(screen1.x, screen1.y, fallback_color);
-      m_rasterizer->put_pixel(screen2.x, screen2.y, fallback_color);
+      m_rasterizer->put_pixel(screen0.x, screen0.y);
+      m_rasterizer->put_pixel(screen1.x, screen1.y);
+      m_rasterizer->put_pixel(screen2.x, screen2.y);
       break;
     }
     case RenderMode::WireFrame: {
-      m_rasterizer->draw_line(screen0, screen1, fallback_color);
-      m_rasterizer->draw_line(screen1, screen2, fallback_color);
-      m_rasterizer->draw_line(screen2, screen0, fallback_color);
+      m_rasterizer->draw_line(screen0, screen1);
+      m_rasterizer->draw_line(screen1, screen2);
+      m_rasterizer->draw_line(screen2, screen0);
       break;
     }
     } // switch RenderMode

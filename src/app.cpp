@@ -154,10 +154,10 @@ void App::render() {
   m_rasterizer.clear();
 
   // fill background - gray
-  Color bg_color = colors::Gray;
-  for (auto &pixel : m_rasterizer.frame_buffer()) {
-    pixel = bg_color;
-  }
+  // Color bg_color = colors::Gray;
+  // for (auto &pixel : m_rasterizer.frame_buffer()) {
+  //   pixel = bg_color;
+  // }
 
   // render
   mat4 model(1.f);

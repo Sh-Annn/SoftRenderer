@@ -79,7 +79,7 @@ Mesh MeshLoader::load_obj(const std::string &filename, Color default_color) {
   }
   file.close();
 
-  mesh.set_uniform_color(default_color);
+  // mesh.set_uniform_color(default_color);
 
   std::cout << "Loaded OBJ: " << filename << '\n';
   std::cout << "  Vertices: " << mesh.vertex_count() << '\n';

@@ -36,13 +36,13 @@ void Rasterizer::clear() {
   std::fill(depth_buf.begin(), depth_buf.end(), 1.f);
 }
 
-void Rasterizer::put_pixel(int x, int y, Color color) {
+void Rasterizer::put_pixel(int x, int y) {
   if (x >= 0 && x < w_ && y >= 0 && y < h_) {
-    frame_buf[y * w_ + x] = color;
+    frame_buf[y * w_ + x] = colors::Green;
   }
 }
 
-void Rasterizer::draw_line(Vec3 a, Vec3 b, Color color) {
+void Rasterizer::draw_line(Vec3 a, Vec3 b) {
   bool steep = std::abs(b.y - a.y) > std::abs(b.x - a.x);
   if (steep) {
     std::swap(a.x, a.y);
@@ -55,14 +55,15 @@ void Rasterizer::draw_line(Vec3 a, Vec3 b, Color color) {
 
   int y = a.y;
   int ierror = 0;
+#pragma omp parallel for
   for (int x = a.x; x < b.x; ++x) {
     float t = (float)(x - a.x) / (b.x - a.x);
     float curr_z = math::lerp(a.z, b.z, t);
     int idx = y * w_ + x;
     if (steep) {
-      put_pixel(y, x, color);
+      put_pixel(y, x);
     } else {
-      put_pixel(x, y, color);
+      put_pixel(x, y);
     }
 
     ierror += 2 * std::abs(b.y - a.y);
@@ -79,27 +80,22 @@ float Rasterizer::signed_triangle_area(const Vec3 &a, const Vec3 &b,
 
 void Rasterizer::draw_filled_triangle(const Vertex &v0, const Vertex &v1,
                                       const Vertex &v2, const Texture *texture,
-                                      Color fallback_color,
                                       const Vec3 &view_pos) {
   if (!valid()) {
     return;
   }
 
-  const Vec3 &sa = v0.pos;
-  const Vec3 &sb = v1.pos;
-  const Vec3 &sc = v2.pos;
-
-  int min_x = (int)std::floor(std::min({sa.x, sb.x, sc.x}));
-  int min_y = (int)std::floor(std::min({sa.y, sb.y, sc.y}));
-  int max_x = (int)std::floor(std::max({sa.x, sb.x, sc.x}));
-  int max_y = (int)std::floor(std::max({sa.y, sb.y, sc.y}));
+  int min_x = (int)std::floor(std::min({v0.pos.x, v1.pos.x, v2.pos.x}));
+  int min_y = (int)std::floor(std::min({v0.pos.y, v1.pos.y, v2.pos.y}));
+  int max_x = (int)std::floor(std::max({v0.pos.x, v1.pos.x, v2.pos.x}));
+  int max_y = (int)std::floor(std::max({v0.pos.y, v1.pos.y, v2.pos.y}));
 
   min_x = std::max(min_x, 0);
   min_y = std::max(min_y, 0);
   max_x = std::min(max_x, w_ - 1);
   max_y = std::min(max_y, h_ - 1);
 
-  float area = signed_triangle_area(sa, sb, sc);
+  float area = signed_triangle_area(v0.pos, v1.pos, v2.pos);
   if (std::abs(area) < 1e-6f) {
     return;
   }
@@ -114,22 +110,22 @@ void Rasterizer::draw_filled_triangle(const Vertex &v0, const Vertex &v1,
   const Vec3 light_color = {1.0f, 1.0f, 1.0f};
   const float Ia = 0.5f;
   const float Is = 3.f;
-  const Vec3 ambient = Ia * light_color;
+  const Vec3 la = Ia * light_color;
 
   for (int y = min_y; y <= max_y; ++y) {
     for (int x = min_x; x <= max_x; ++x) {
-      float alpha = signed_triangle_area({x, y, 0}, sb, sc) / area;
-      float beta = signed_triangle_area({x, y, 0}, sc, sa) / area;
-      float gama = signed_triangle_area({x, y, 0}, sa, sb) / area;
+      float alpha = signed_triangle_area({x, y, 0}, v1.pos, v2.pos) / area;
+      float beta = signed_triangle_area({x, y, 0}, v2.pos, v0.pos) / area;
+      float gama = signed_triangle_area({x, y, 0}, v0.pos, v1.pos) / area;
 
       if (alpha >= 0 && beta >= 0 && gama >= 0) {
-        float depth = alpha * sa.z + beta * sb.z + gama * sc.z;
+        float depth = alpha * v0.pos.z + beta * v1.pos.z + gama * v2.pos.z;
 
         int idx = y * w_ + x;
         bool pass_depth = !m_depth_test_enabled || (depth < depth_buf[idx]);
 
         if (pass_depth) {
-          Color color = fallback_color;
+          Color color;
 
           float inv_w = alpha * inv_w0 + beta * inv_w1 + gama * inv_w2;
 
@@ -153,7 +149,8 @@ void Rasterizer::draw_filled_triangle(const Vertex &v0, const Vertex &v1,
             color = texture->sample(u, v);
 
           } else {
-            color = fallback_color;
+            color = make_color((u8)(la.x * 255.f), (u8)(la.y * 255.f),
+                               (u8)(la.z * 255.f));
           }
 
           if (m_light_enabled) {
@@ -177,8 +174,15 @@ void Rasterizer::draw_filled_triangle(const Vertex &v0, const Vertex &v1,
             float diff = std::max(glm::dot(p_normal, light_dir), 0.f);
             Vec3 diffuse = diff * light_color;
 
+            // Specular
+            Vec3 view_dir = glm::normalize(view_pos - p_world_pos);
+            Vec3 reflect_dir = glm::reflect(-light_dir, p_normal);
+            float spec =
+                std::pow(std::max(glm::dot(view_dir, reflect_dir), 0.0f), 100);
+            Vec3 ls = Is * spec * light_color;
+
             // Result
-            Vec3 result = diffuse * object_color;
+            Vec3 result = (la + diffuse + ls) * object_color;
             result = glm::clamp(result, 0.f, 1.f);
 
             color = make_color((u8)(result.x * 255), (u8)(result.y * 255),

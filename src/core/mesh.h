@@ -14,16 +14,16 @@ public:
 
   std::vector<int> indices;
 
-  std::vector<Color> vertex_colors;
-  std::vector<Color> triangle_colors;
+  // std::vector<Color> vertex_colors;
+  // std::vector<Color> triangle_colors;
 
   int triangle_count() const { return static_cast<int>(indices.size()) / 3; }
   int vertex_count() const { return static_cast<int>(positions.size()); }
 
   bool has_normals() const { return !normals.empty(); }
   bool has_texcoords() const { return !texcoords.empty(); }
-  bool use_vertex_colors() const { return !vertex_colors.empty(); }
-  bool use_triangle_colors() const { return !triangle_colors.empty(); }
+  // bool use_vertex_colors() const { return !vertex_colors.empty(); }
+  // bool use_triangle_colors() const { return !triangle_colors.empty(); }
 
   void get_triangle_indices(int idx, int &i0, int &i1, int &i2) const {
     i0 = indices[idx * 3 + 0];
@@ -32,6 +32,6 @@ public:
   }
 
   static Mesh create_cube();
-  void set_uniform_color(Color color);
+  // void set_uniform_color(Color color);
 };
 } // namespace core

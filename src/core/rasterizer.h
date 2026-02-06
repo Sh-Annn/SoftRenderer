@@ -12,11 +12,11 @@ public:
 
   void clear();
 
-  void put_pixel(int x, int y, Color color);
-  void draw_line(Vec3 a, Vec3 b, Color color);
+  void put_pixel(int x, int y);
+  void draw_line(Vec3 a, Vec3 b);
   void draw_filled_triangle(const Vertex &v0, const Vertex &v1,
                             const Vertex &v2, const Texture *texture,
-                            Color fallback_color, const Vec3 &view_pos);
+                            const Vec3 &view_pos);
   float signed_triangle_area(const Vec3 &a, const Vec3 &b, const Vec3 &c);
 
   std::vector<Color> &frame_buffer() { return frame_buf; }
