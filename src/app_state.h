@@ -24,4 +24,8 @@ struct AppState {
   bool texture_enabled = false;
 
   bool light_enabled = true;
+  bool diff_enabled = true;
+  bool spec_enabled = true;
+  Vec3 light_position = {-2.f, 2.f, 2.f};
+  float LIGHT_INTENSITY = 1.f;
 };

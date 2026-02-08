@@ -28,11 +28,17 @@ public:
   }
   void set_texture_enabled(bool enabled) { m_texture_enabled = enabled; }
   void set_light_enabled(bool enabled) { m_light_enabled = enabled; }
+  void set_diff_enabled(bool enabled) { m_diff_enabled = enabled; }
+  void set_spec_enabled(bool enabled) { m_spec_enabled = enabled; }
+  void set_light_pos(Vec3 position) { m_light_pos = position; }
+  void set_light_intensity(float intensity) { m_light_intensity = intensity; }
 
   bool is_depth_test_enabled() const { return m_depth_test_enabled; }
   bool is_persp_interp_enabled() const { return m_persp_interp_enabled; }
   bool is_texture_enabled() const { return m_texture_enabled; }
   bool is_light_enabled() const { return m_light_enabled; }
+  bool is_diff_enabled() const { return m_diff_enabled; }
+  bool is_spec_enabled() const { return m_spec_enabled; }
 
 private:
   std::vector<Color> frame_buf;
@@ -43,6 +49,10 @@ private:
   bool m_persp_interp_enabled = true;
   bool m_texture_enabled = true;
   bool m_light_enabled = true;
+  bool m_diff_enabled = true;
+  bool m_spec_enabled = true;
+  Vec3 m_light_pos = {-2.f, 2.f, 2.f};
+  float m_light_intensity = 1.f;
 
   bool valid() const { return w_ > 0 && h_ > 0; }
 };

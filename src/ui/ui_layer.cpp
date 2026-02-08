@@ -189,6 +189,18 @@ void draw(SDL_Texture *framebuffer_tex, AppState &state) {
 
       ImGui::Separator();
       ImGui::Checkbox("light enabled", &state.light_enabled);
+      if (state.light_enabled) {
+        ImGui::SliderFloat("light intensity:", &state.LIGHT_INTENSITY, 0.1f,
+                           5.f);
+        ImGui::SliderFloat("light pos x:", &state.light_position.x, -20.f,
+                           20.f);
+        ImGui::SliderFloat("light pos y:", &state.light_position.y, -20.f,
+                           20.f);
+        ImGui::SliderFloat("light pos z:", &state.light_position.z, -20.f,
+                           20.f);
+        ImGui::Checkbox("diff enabled", &state.diff_enabled);
+        ImGui::Checkbox("spec enabled", &state.spec_enabled);
+      }
     }
 
     // if (!state.depth_test_enabled) {

@@ -6,21 +6,6 @@
 #include <glm/geometric.hpp>
 
 namespace core {
-// Vec3 fragment(Vec3 n, Vec3 pos) {
-//   Vec3 kd = {0.79, 0.79, 0.79};
-//   Vec3 light = {-20, 20, 0};
-//
-//   Vec3 l = glm::normalize(light - pos);
-//
-//   float r_2 = glm::dot((pos - light), (pos - light));
-//
-//   Vec3 ls = kd * (glm::normalize(light) / r_2) * std::max(0.f, glm::dot(n,
-//   l));
-//
-//   Vec3 result = ls;
-//
-//   return result;
-// }
 void Rasterizer::Init(int width, int height) {
   w_ = width;
   h_ = height;
@@ -106,11 +91,13 @@ void Rasterizer::draw_filled_triangle(const Vertex &v0, const Vertex &v1,
 
   // Phong Lighting parameters (Constant for the frame/triangle in this simple
   // implementation)
-  const Vec3 light_pos = {2.0f, 2.0f, 2.0f};
   const Vec3 light_color = {1.0f, 1.0f, 1.0f};
   const float Ia = 0.5f;
-  const float Is = 3.f;
-  const Vec3 la = Ia * light_color;
+  // const float Is = 1.f;
+  const Vec3 kd = {0.5f, 0.5f, 0.5f};
+  const Vec3 ks = {0.5f, 0.5f, 0.5f};
+  // const Vec3 ka = light_color;
+  const Vec3 la = light_color * Ia;
 
   for (int y = min_y; y <= max_y; ++y) {
     for (int x = min_x; x <= max_x; ++x) {
@@ -169,20 +156,29 @@ void Rasterizer::draw_filled_triangle(const Vertex &v0, const Vertex &v1,
             object_color.g = ((color >> 8) & 0xFF) / 255.f;
             object_color.b = (color & 0xFF) / 255.f;
 
+            Vec3 light_dir_norm = glm::normalize(m_light_pos - p_world_pos);
+            Vec3 view_dir_norm = glm::normalize(view_pos - p_world_pos);
+            Vec3 h = glm::normalize(light_dir_norm + view_dir_norm);
+
+            float r_2 = glm::dot(light_dir_norm, light_dir_norm);
+            float I_INTENSITY = m_light_intensity / r_2;
+
             // Diffuse
-            Vec3 light_dir = glm::normalize(light_pos - p_world_pos);
-            float diff = std::max(glm::dot(p_normal, light_dir), 0.f);
-            Vec3 diffuse = diff * light_color;
+            Vec3 ld = {0.f, 0.f, 0.f};
+            if (m_diff_enabled) {
+              float diff = std::max(glm::dot(p_normal, light_dir_norm), 0.f);
+              ld = kd * I_INTENSITY * diff;
+            }
 
             // Specular
-            Vec3 view_dir = glm::normalize(view_pos - p_world_pos);
-            Vec3 reflect_dir = glm::reflect(-light_dir, p_normal);
-            float spec =
-                std::pow(std::max(glm::dot(view_dir, reflect_dir), 0.0f), 100);
-            Vec3 ls = Is * spec * light_color;
+            Vec3 ls = {0.f, 0.f, 0.f};
+            if (m_spec_enabled) {
+              float spec = std::pow(std::max(0.f, glm::dot(h, p_normal)), 150);
+              ls = ks * I_INTENSITY * spec;
+            }
 
             // Result
-            Vec3 result = (la + diffuse + ls) * object_color;
+            Vec3 result = (la + ld + ls) * object_color;
             result = glm::clamp(result, 0.f, 1.f);
 
             color = make_color((u8)(result.x * 255), (u8)(result.y * 255),
