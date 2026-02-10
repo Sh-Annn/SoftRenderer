@@ -81,7 +81,7 @@ void Rasterizer::draw_filled_triangle(const Vertex &v0, const Vertex &v1,
   max_y = std::min(max_y, h_ - 1);
 
   float area = signed_triangle_area(v0.pos, v1.pos, v2.pos);
-  if (std::abs(area) < 1e-6f) {
+  if (area > 0) {
     return;
   }
 
