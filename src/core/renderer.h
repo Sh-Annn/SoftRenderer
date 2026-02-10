@@ -22,6 +22,9 @@ private:
   Vec3 perspective_divide(const Vec4 &clip_pos) const;
   Vec3 viewport_transform(const Vec3 &ndc) const;
 
+  bool inside_plane(const Vec4 &plane, const Vec4 &p);
+  bool all_inside_plane(const Vec4 &v0, const Vec4 &v1, const Vec4 &v2);
+
   Rasterizer *m_rasterizer;
   int m_viewport_width;
   int m_viewport_height;

@@ -45,6 +45,10 @@ void Renderer::draw_mesh(const Mesh &mesh, const mat4 &model, const mat4 &mvp,
       continue;
     }
 
+    if (!all_inside_plane(clip0, clip1, clip2)) {
+      continue;
+    }
+
     // Vec3 world_pos0 = Vec3(model * Vec4(v0, 1.f));
     // Vec3 world_pos1 = Vec3(model * Vec4(v1, 1.f));
     // Vec3 world_pos2 = Vec3(model * Vec4(v2, 1.f));
@@ -118,5 +122,44 @@ Vec3 Renderer::viewport_transform(const Vec3 &ndc) const {
   float z = (ndc.z + 1.f) * 0.5f;
 
   return Vec3(x, y, z);
+}
+
+bool Renderer::inside_plane(const Vec4 &plane, const Vec4 &p) {
+  return (plane.x * p.x + plane.y * p.y + plane.z * p.z + plane.w * p.w) >= 0;
+}
+
+bool Renderer::all_inside_plane(const Vec4 &v0, const Vec4 &v1,
+                                const Vec4 &v2) {
+  if (v0.x > v0.w || v0.x < -v0.w) {
+    return false;
+  }
+  if (v0.y > v0.w || v0.y < -v0.w) {
+    return false;
+  }
+  if (v0.z > v0.w || v0.z < -v0.w) {
+    return false;
+  }
+
+  if (v1.x > v1.w || v1.x < -v1.w) {
+    return false;
+  }
+  if (v1.y > v1.w || v1.y < -v1.w) {
+    return false;
+  }
+  if (v1.z > v1.w || v1.z < -v1.w) {
+    return false;
+  }
+
+  if (v2.x > v2.w || v2.x < -v2.w) {
+    return false;
+  }
+  if (v2.y > v2.w || v2.y < -v2.w) {
+    return false;
+  }
+  if (v2.z > v2.w || v2.z < -v2.w) {
+    return false;
+  }
+
+  return true;
 }
 } // namespace core

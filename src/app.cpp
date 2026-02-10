@@ -24,7 +24,7 @@ bool App::init(const char *title, int window_width, int window_height) {
   }
 
   m_camera = core::Camera(Vec3(0, 0, 5), Vec3(0, 0, 0), Vec3(0, 1, 0));
-  m_camera.set_perspective(45.f, (float)RD_WIDTH / RD_HEIGHT, 0.1f, 100.f);
+  m_camera.set_perspective(45.f, (float)RD_WIDTH / RD_HEIGHT, 2.f, 100.f);
   m_camera.sync_orthographic_to_perspective(4.f);
 
   m_mesh = core::MeshLoader::load_obj("../obj/diablo3_pose/diablo3_pose.obj",
