@@ -45,7 +45,7 @@ void Renderer::draw_mesh(const Mesh &mesh, const mat4 &model, const mat4 &mvp,
       continue;
     }
 
-    if (!all_inside_plane(clip0, clip1, clip2)) {
+    if (m_clipping_enabled && (!all_inside_plane(clip0, clip1, clip2))) {
       continue;
     }
 

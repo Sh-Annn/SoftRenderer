@@ -18,6 +18,10 @@ public:
 
   void set_viewport(int width, int height);
 
+  void set_clipping_enabled(bool enabled) { m_clipping_enabled = enabled; }
+
+  bool is_clipping_enabled() const { return m_clipping_enabled; }
+
 private:
   Vec3 perspective_divide(const Vec4 &clip_pos) const;
   Vec3 viewport_transform(const Vec3 &ndc) const;
@@ -28,5 +32,7 @@ private:
   Rasterizer *m_rasterizer;
   int m_viewport_width;
   int m_viewport_height;
+
+  bool m_clipping_enabled = true;
 };
 } // namespace core

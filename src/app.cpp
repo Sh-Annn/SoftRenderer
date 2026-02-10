@@ -128,6 +128,8 @@ void App::sync_state() {
     m_camera.set_projection_type(core_proj);
   }
 
+  m_renderer->set_clipping_enabled(m_app_state.clipping_enabled);
+
   // rasterizer settings
   // depth test
   m_rasterizer.set_depth_test_enabled(m_app_state.depth_test_enabled);

@@ -28,4 +28,6 @@ struct AppState {
   bool spec_enabled = true;
   Vec3 light_position = {-2.f, 2.f, 2.f};
   float LIGHT_INTENSITY = 1.f;
+
+  bool clipping_enabled = true;
 };

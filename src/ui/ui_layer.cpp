@@ -176,6 +176,8 @@ void draw(SDL_Texture *framebuffer_tex, AppState &state) {
               "Depth test disabled - triangles may overlap incorrectly");
         }
       }
+
+      ImGui::Checkbox("clipping", &state.clipping_enabled);
     }
 
     // bool perspctive_inter =
