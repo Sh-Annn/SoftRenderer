@@ -143,6 +143,7 @@ void App::sync_state() {
   m_rasterizer.set_spec_enabled(m_app_state.spec_enabled);
   m_rasterizer.set_light_pos(m_app_state.light_position);
   m_rasterizer.set_light_intensity(m_app_state.LIGHT_INTENSITY);
+  m_rasterizer.set_back_face_enabled(m_app_state.back_face_enabled);
 
   if (m_app_state.request_camera_reset) {
     m_camera.reset();

@@ -4,6 +4,7 @@ project(soft_renderer LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+option(ENABLE_OPENMP "Enabled OpenMP for core rendering" ON)
 
 # sdl2 -------------------------------------------------------
 find_package(PkgConfig REQUIRED)
@@ -50,6 +51,13 @@ target_include_directories(core PUBLIC
 	${CMAKE_SOURCE_DIR}/src/core
 	${CMAKE_SOURCE_DIR}/src
 )
+
+if(ENABLE_OPENMP)
+	find_package(OpenMP)
+	if(OpenMP_CXX_FOUND)
+		target_link_libraries(core PUBLIC OpenMP::OpenMP_CXX)
+	endif()
+endif()
 
 # platform layer ---------------------------------------------
 add_library(platform STATIC

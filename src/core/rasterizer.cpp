@@ -40,7 +40,7 @@ void Rasterizer::draw_line(Vec3 a, Vec3 b) {
 
   int y = a.y;
   int ierror = 0;
-#pragma omp parallel for
+  // #pragma omp parallel for
   for (int x = a.x; x < b.x; ++x) {
     float t = (float)(x - a.x) / (b.x - a.x);
     float curr_z = math::lerp(a.z, b.z, t);
@@ -63,25 +63,12 @@ float Rasterizer::signed_triangle_area(const Vec3 &a, const Vec3 &b,
                 (a.y - c.y) * (a.x + c.x));
 }
 
-void Rasterizer::draw_filled_triangle(const Vertex &v0, const Vertex &v1,
-                                      const Vertex &v2, const Texture *texture,
-                                      const Vec3 &view_pos) {
-  if (!valid()) {
-    return;
-  }
-
-  int min_x = (int)std::floor(std::min({v0.pos.x, v1.pos.x, v2.pos.x}));
-  int min_y = (int)std::floor(std::min({v0.pos.y, v1.pos.y, v2.pos.y}));
-  int max_x = (int)std::floor(std::max({v0.pos.x, v1.pos.x, v2.pos.x}));
-  int max_y = (int)std::floor(std::max({v0.pos.y, v1.pos.y, v2.pos.y}));
-
-  min_x = std::max(min_x, 0);
-  min_y = std::max(min_y, 0);
-  max_x = std::min(max_x, w_ - 1);
-  max_y = std::min(max_y, h_ - 1);
-
-  float area = signed_triangle_area(v0.pos, v1.pos, v2.pos);
-  if (area > 0) {
+void Rasterizer::rasterize_triangle_region(const Vertex &v0, const Vertex &v1,
+                                           const Vertex &v2, float area,
+                                           const Texture *texture,
+                                           const Vec3 &view_pos, int min_x,
+                                           int min_y, int max_x, int max_y) {
+  if (std::abs(area) < 1e-8f || min_x > max_x || min_y > max_y) {
     return;
   }
 
@@ -194,5 +181,93 @@ void Rasterizer::draw_filled_triangle(const Vertex &v0, const Vertex &v1,
       } // barycentric coordinates
     }
   }
+}
+
+void Rasterizer::draw_filled_triangle(const Vertex &v0, const Vertex &v1,
+                                      const Vertex &v2, const Texture *texture,
+                                      const Vec3 &view_pos) {
+  if (!valid()) {
+    return;
+  }
+
+  int min_x = (int)std::floor(std::min({v0.pos.x, v1.pos.x, v2.pos.x}));
+  int min_y = (int)std::floor(std::min({v0.pos.y, v1.pos.y, v2.pos.y}));
+  int max_x = (int)std::floor(std::max({v0.pos.x, v1.pos.x, v2.pos.x}));
+  int max_y = (int)std::floor(std::max({v0.pos.y, v1.pos.y, v2.pos.y}));
+
+  min_x = std::max(min_x, 0);
+  min_y = std::max(min_y, 0);
+  max_x = std::min(max_x, w_ - 1);
+  max_y = std::min(max_y, h_ - 1);
+
+  const float area = signed_triangle_area(v0.pos, v1.pos, v2.pos);
+  if (m_back_face_enabled && area > 0) {
+    return;
+  }
+
+  rasterize_triangle_region(v0, v1, v2, area, texture, view_pos, min_x, min_y,
+                            max_x, max_y);
+}
+
+void Rasterizer::draw_filled_triangles_tiled(
+    const std::vector<ScreenTriangle> &tris, const Texture *texture,
+    const Vec3 &view_pos, int tile_size) {
+  if (!valid() || tris.empty()) {
+    return;
+  }
+
+  if (tile_size <= 0) {
+    tile_size = 16;
+  }
+
+  const int tiles_x = (w_ + tile_size - 1) / tile_size;
+  const int tiles_y = (h_ + tile_size - 1) / tile_size;
+  std::vector<std::vector<int>> bins(tiles_x * tiles_y);
+
+  for (int tri_idx = 0; tri_idx < (int)tris.size(); tri_idx++) {
+    const ScreenTriangle &tri = tris[tri_idx];
+
+    int min_x = std::max(0, std::min(w_ - 1, tri.min_x));
+    int min_y = std::max(0, std::min(h_ - 1, tri.min_y));
+    int max_x = std::max(0, std::min(w_ - 1, tri.max_x));
+    int max_y = std::max(0, std::min(h_ - 1, tri.max_y));
+    if (min_x > max_x || min_y > max_y) {
+      continue;
+    }
+
+    int tile_min_x = min_x / tile_size;
+    int tile_max_x = max_x / tile_size;
+    int tile_min_y = min_y / tile_size;
+    int tile_max_y = max_y / tile_size;
+
+    for (int ty = tile_min_y; ty <= tile_max_y; ty++) {
+      for (int tx = tile_min_x; tx <= tile_max_x; tx++) {
+        bins[ty * tiles_x + tx].push_back(tri_idx);
+      }
+    }
+  } // for tri_idx
+#pragma omp parallel for schedule(dynamic, 1)
+  for (int tile_id = 0; tile_id < tiles_x * tiles_y; tile_id++) {
+    const int tx = tile_id % tiles_x;
+    const int ty = tile_id / tiles_x;
+
+    const int tile_x0 = tx * tile_size;
+    const int tile_y0 = ty * tile_size;
+    const int tile_x1 = std::min(tile_x0 + tile_size - 1, w_ - 1);
+    const int tile_y1 = std::min(tile_y0 + tile_size - 1, h_ - 1);
+
+    const std::vector<int> &tile_tris = bins[tile_id];
+    for (int tri_idx : tile_tris) {
+      const ScreenTriangle &tri = tris[tri_idx];
+
+      const int min_x = std::max(tile_x0, std::max(0, tri.min_x));
+      const int min_y = std::max(tile_y0, std::max(0, tri.min_y));
+      const int max_x = std::min(tile_x1, std::min(w_ - 1, tri.max_x));
+      const int max_y = std::min(tile_y1, std::min(h_ - 1, tri.max_y));
+
+      rasterize_triangle_region(tri.v0, tri.v1, tri.v2, tri.area, texture,
+                                view_pos, min_x, min_y, max_x, max_y);
+    }
+  } // for tile_id
 }
 } // namespace core

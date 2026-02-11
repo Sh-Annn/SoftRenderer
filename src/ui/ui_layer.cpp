@@ -178,6 +178,7 @@ void draw(SDL_Texture *framebuffer_tex, AppState &state) {
       }
 
       ImGui::Checkbox("clipping", &state.clipping_enabled);
+      ImGui::Checkbox("back_face", &state.back_face_enabled);
     }
 
     // bool perspctive_inter =

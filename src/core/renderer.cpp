@@ -1,8 +1,12 @@
 #include "renderer.h"
+#include "rasterizer.h"
 #include "texture.h"
 #include <SDL2/SDL_keycode.h>
 
 #include "../app_state.h"
+
+#include <algorithm>
+#include <cmath>
 
 namespace core {
 Renderer::Renderer(Rasterizer *rasterizer, int viewport_width,
@@ -13,6 +17,11 @@ Renderer::Renderer(Rasterizer *rasterizer, int viewport_width,
 void Renderer::draw_mesh(const Mesh &mesh, const mat4 &model, const mat4 &mvp,
                          const Vec3 &view_pos, const AppState &state,
                          const Texture *texture) {
+  std::vector<ScreenTriangle> solid_tris;
+  if (state.render_mode == RenderMode::Solid) {
+    solid_tris.reserve(mesh.triangle_count());
+  }
+
   for (int i = 0; i < mesh.triangle_count(); i++) {
     int i0, i1, i2;
     mesh.get_triangle_indices(i, i0, i1, i2);
@@ -78,14 +87,40 @@ void Renderer::draw_mesh(const Mesh &mesh, const mat4 &model, const mat4 &mvp,
     // } else if (mesh.use_vertex_colors()) {
     //   fallback_color = mesh.vertex_colors[i0];
     // }
+    if (state.render_mode == RenderMode::Solid) {
+      ScreenTriangle tri;
+
+      tri.v0 = {screen0, uv0, clip0.w, v0, world_normal0};
+      tri.v1 = {screen1, uv1, clip1.w, v1, world_normal1};
+      tri.v2 = {screen2, uv2, clip2.w, v2, world_normal2};
+      tri.area = m_rasterizer->signed_triangle_area(tri.v0.pos, tri.v1.pos,
+                                                    tri.v2.pos);
+      if (m_rasterizer->is_back_face_enabled() && tri.area > 0.f) {
+        continue;
+      }
+
+      tri.min_x = std::max(0, (int)std::floor(std::min(
+                                  {tri.v0.pos.x, tri.v1.pos.x, tri.v2.pos.x})));
+      tri.min_y = std::max(0, (int)std::floor(std::min(
+                                  {tri.v0.pos.y, tri.v1.pos.y, tri.v2.pos.y})));
+      tri.max_x = std::min(m_viewport_width - 1,
+                           (int)std::floor(std::max(
+                               {tri.v0.pos.x, tri.v1.pos.x, tri.v2.pos.x})));
+      tri.max_y = std::min(m_viewport_height - 1,
+                           (int)std::floor(std::max(
+                               {tri.v0.pos.y, tri.v1.pos.y, tri.v2.pos.y})));
+      if (tri.min_x > tri.max_x || tri.min_y > tri.max_y) {
+        continue;
+      }
+
+      solid_tris.push_back(tri);
+    }
 
     switch (state.render_mode) {
     case RenderMode::Solid: {
-      Vertex vert0 = {screen0, uv0, clip0.w, v0, world_normal0};
-      Vertex vert1 = {screen1, uv1, clip1.w, v1, world_normal1};
-      Vertex vert2 = {screen2, uv2, clip2.w, v2, world_normal2};
-      m_rasterizer->draw_filled_triangle(vert0, vert1, vert2, texture,
-                                         view_pos);
+
+      // m_rasterizer->draw_filled_triangle(vert0, vert1, vert2, texture,
+      //                                    view_pos);
       break;
     }
     case RenderMode::Vertex: {
@@ -101,6 +136,9 @@ void Renderer::draw_mesh(const Mesh &mesh, const mat4 &model, const mat4 &mvp,
       break;
     }
     } // switch RenderMode
+  }
+  if (state.render_mode == RenderMode::Solid) {
+    m_rasterizer->draw_filled_triangles_tiled(solid_tris, texture, view_pos);
   }
 }
 

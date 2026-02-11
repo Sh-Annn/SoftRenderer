@@ -30,4 +30,5 @@ struct AppState {
   float LIGHT_INTENSITY = 1.f;
 
   bool clipping_enabled = true;
+  bool back_face_enabled = true;
 };
