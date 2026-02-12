@@ -45,6 +45,8 @@ add_library(core STATIC
 	${CMAKE_SOURCE_DIR}/src/core/mesh_loader.cpp
 	${CMAKE_SOURCE_DIR}/src/core/texture.cpp
 	${CMAKE_SOURCE_DIR}/src/core/texture_loader.cpp
+	${CMAKE_SOURCE_DIR}/src/core/shaders/phong_shader.cpp
+
 
 )
 target_include_directories(core PUBLIC

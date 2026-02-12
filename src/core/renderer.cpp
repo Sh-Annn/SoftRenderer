@@ -1,4 +1,7 @@
 #include "renderer.h"
+#include "shader_types.h"
+#include "shaders/phong_shader.h"
+
 #include "rasterizer.h"
 #include "texture.h"
 #include <SDL2/SDL_keycode.h>
@@ -17,6 +20,28 @@ Renderer::Renderer(Rasterizer *rasterizer, int viewport_width,
 void Renderer::draw_mesh(const Mesh &mesh, const mat4 &model, const mat4 &mvp,
                          const Vec3 &view_pos, const AppState &state,
                          const Texture *texture) {
+  PhongShader phong_shader;
+
+  const IShader *shader = &phong_shader;
+  switch (state.shader_type) {
+  case ShaderType::Phong:
+    shader = &phong_shader;
+    break;
+  }
+
+  ShaderUniforms uniforms;
+  uniforms.model = model;
+  uniforms.mvp = mvp;
+  uniforms.view_pos = view_pos;
+  uniforms.texture = texture;
+  uniforms.texture_enabled = state.texture_enabled;
+  uniforms.light_enabled = state.light_enabled;
+  uniforms.diff_enabled = state.diff_enabled;
+  uniforms.spec_enabled = state.spec_enabled;
+  uniforms.persp_interp_enabled = state.persp_interp_enabled;
+  uniforms.light_pos = state.light_position;
+  uniforms.light_intensity = state.LIGHT_INTENSITY;
+
   std::vector<ScreenTriangle> solid_tris;
   if (state.render_mode == RenderMode::Solid) {
     solid_tris.reserve(mesh.triangle_count());
@@ -44,9 +69,13 @@ void Renderer::draw_mesh(const Mesh &mesh, const mat4 &model, const mat4 &mvp,
       uv2 = mesh.texcoords[i2];
     }
 
-    Vec4 clip0 = mvp * Vec4(v0, 1.f);
-    Vec4 clip1 = mvp * Vec4(v1, 1.f);
-    Vec4 clip2 = mvp * Vec4(v2, 1.f);
+    const VertexOut out0 = shader->vertex({v0, n0, uv0}, uniforms);
+    const VertexOut out1 = shader->vertex({v1, n1, uv1}, uniforms);
+    const VertexOut out2 = shader->vertex({v2, n2, uv2}, uniforms);
+
+    const Vec4 clip0 = out0.clip_pos;
+    const Vec4 clip1 = out1.clip_pos;
+    const Vec4 clip2 = out2.clip_pos;
 
     // +z ----- -z
     // point ----- camera
@@ -57,24 +86,6 @@ void Renderer::draw_mesh(const Mesh &mesh, const mat4 &model, const mat4 &mvp,
     if (m_clipping_enabled && (!all_inside_plane(clip0, clip1, clip2))) {
       continue;
     }
-
-    // Vec3 world_pos0 = Vec3(model * Vec4(v0, 1.f));
-    // Vec3 world_pos1 = Vec3(model * Vec4(v1, 1.f));
-    // Vec3 world_pos2 = Vec3(model * Vec4(v2, 1.f));
-
-    Vec3 world_normal0 = glm::normalize(Vec3(model * Vec4(n0, 0.0f)));
-    Vec3 world_normal1 = glm::normalize(Vec3(model * Vec4(n1, 0.0f)));
-    Vec3 world_normal2 = glm::normalize(Vec3(model * Vec4(n2, 0.0f)));
-
-    // clip => NDC
-    // Vec3 ndc0 = perspective_divide(clip0);
-    // Vec3 ndc1 = perspective_divide(clip1);
-    // Vec3 ndc2 = perspective_divide(clip2);
-
-    // NDC => SCREEN
-    // Vec3 screen0 = viewport_transform(ndc0);
-    // Vec3 screen1 = viewport_transform(ndc1);
-    // Vec3 screen2 = viewport_transform(ndc2);
 
     // clip => NDC => SCREEN
     Vec3 screen0 = viewport_transform(perspective_divide(clip0));
@@ -90,9 +101,9 @@ void Renderer::draw_mesh(const Mesh &mesh, const mat4 &model, const mat4 &mvp,
     if (state.render_mode == RenderMode::Solid) {
       ScreenTriangle tri;
 
-      tri.v0 = {screen0, uv0, clip0.w, v0, world_normal0};
-      tri.v1 = {screen1, uv1, clip1.w, v1, world_normal1};
-      tri.v2 = {screen2, uv2, clip2.w, v2, world_normal2};
+      tri.v0 = {screen0, out0.uv, clip0.w, out0.world_pos, out0.normal};
+      tri.v1 = {screen1, out1.uv, clip1.w, out1.world_pos, out1.normal};
+      tri.v2 = {screen2, out2.uv, clip2.w, out2.world_pos, out2.normal};
       tri.area = m_rasterizer->signed_triangle_area(tri.v0.pos, tri.v1.pos,
                                                     tri.v2.pos);
       if (m_rasterizer->is_back_face_enabled() && tri.area > 0.f) {
@@ -138,7 +149,7 @@ void Renderer::draw_mesh(const Mesh &mesh, const mat4 &model, const mat4 &mvp,
     } // switch RenderMode
   }
   if (state.render_mode == RenderMode::Solid) {
-    m_rasterizer->draw_filled_triangles_tiled(solid_tris, texture, view_pos);
+    m_rasterizer->draw_filled_triangles_tiled(solid_tris, *shader, uniforms);
   }
 }
 

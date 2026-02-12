@@ -6,8 +6,12 @@ enum class ProjectionType { Perspective, Orthographic };
 
 enum class RenderMode { Solid, WireFrame, Vertex };
 
+// enum class ShaderType { Phong, Unlit, NormalDebug };
+enum class ShaderType { Phong };
+
 struct AppState {
   RenderMode render_mode = RenderMode::Solid;
+  ShaderType shader_type = ShaderType::Phong;
   bool depth_test_enabled = true;
 
   ProjectionType projection_type = ProjectionType::Perspective;
@@ -19,7 +23,7 @@ struct AppState {
 
   bool request_camera_reset = false;
 
-  bool persp_interp = true;
+  bool persp_interp_enabled = true;
 
   bool texture_enabled = false;
 

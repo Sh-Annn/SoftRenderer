@@ -185,7 +185,7 @@ void draw(SDL_Texture *framebuffer_tex, AppState &state) {
     //     state.persp_interp || (state.render_mode == RenderMode::Solid);
     if (state.render_mode == RenderMode::Solid) {
       ImGui::Separator();
-      ImGui::Checkbox("perspctive interp", &state.persp_interp);
+      ImGui::Checkbox("perspctive interp", &state.persp_interp_enabled);
 
       ImGui::Separator();
       ImGui::Checkbox("texture enabled", &state.texture_enabled);

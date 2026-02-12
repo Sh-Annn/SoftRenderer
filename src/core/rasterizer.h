@@ -2,8 +2,11 @@
 
 #include "../types.h"
 
+#include "shader_types.h"
 #include "texture.h"
 #include "vertex.h"
+
+#include "shader.h"
 
 namespace core {
 struct ScreenTriangle {
@@ -26,10 +29,11 @@ public:
   void put_pixel(int x, int y);
   void draw_line(Vec3 a, Vec3 b);
   void draw_filled_triangle(const Vertex &v0, const Vertex &v1,
-                            const Vertex &v2, const Texture *texture,
-                            const Vec3 &view_pos);
+                            const Vertex &v2, const IShader &shader,
+                            const ShaderUniforms &uniforms);
   void draw_filled_triangles_tiled(const std::vector<ScreenTriangle> &tris,
-                                   const Texture *texture, const Vec3 &view_pos,
+                                   const IShader &shader,
+                                   const ShaderUniforms &uniforms,
                                    int tile_size = 16);
   float signed_triangle_area(const Vec3 &a, const Vec3 &b, const Vec3 &c);
 
@@ -59,8 +63,9 @@ public:
 private:
   void rasterize_triangle_region(const Vertex &v0, const Vertex &v1,
                                  const Vertex &v2, float area,
-                                 const Texture *texture, const Vec3 &view_pos,
-                                 int min_x, int min_y, int max_x, int max_y);
+                                 const IShader &shader,
+                                 const ShaderUniforms &uniforms, int min_x,
+                                 int min_y, int max_x, int max_y);
   std::vector<Color> frame_buf;
   std::vector<float> depth_buf;
   int w_ = 0;

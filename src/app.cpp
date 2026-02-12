@@ -134,7 +134,7 @@ void App::sync_state() {
   // depth test
   m_rasterizer.set_depth_test_enabled(m_app_state.depth_test_enabled);
   // persp_interp
-  m_rasterizer.set_persp_interp_enabled(m_app_state.persp_interp);
+  m_rasterizer.set_persp_interp_enabled(m_app_state.persp_interp_enabled);
   // texture
   m_rasterizer.set_texture_enabled(m_app_state.texture_enabled);
   // light
