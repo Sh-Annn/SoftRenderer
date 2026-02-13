@@ -136,13 +136,13 @@ void App::sync_state() {
   // persp_interp
   m_rasterizer.set_persp_interp_enabled(m_app_state.persp_interp_enabled);
   // texture
-  m_rasterizer.set_texture_enabled(m_app_state.texture_enabled);
+  // m_rasterizer.set_texture_enabled(m_app_state.texture_enabled);
   // light
-  m_rasterizer.set_light_enabled(m_app_state.light_enabled);
-  m_rasterizer.set_diff_enabled(m_app_state.diff_enabled);
-  m_rasterizer.set_spec_enabled(m_app_state.spec_enabled);
-  m_rasterizer.set_light_pos(m_app_state.light_position);
-  m_rasterizer.set_light_intensity(m_app_state.LIGHT_INTENSITY);
+  // m_rasterizer.set_light_enabled(m_app_state.light_enabled);
+  // m_rasterizer.set_diff_enabled(m_app_state.diff_enabled);
+  // m_rasterizer.set_spec_enabled(m_app_state.spec_enabled);
+  // m_rasterizer.set_light_pos(m_app_state.light_position);
+  // m_rasterizer.set_light_intensity(m_app_state.LIGHT_INTENSITY);
   m_rasterizer.set_back_face_enabled(m_app_state.back_face_enabled);
 
   if (m_app_state.request_camera_reset) {

@@ -1,6 +1,7 @@
 #include "renderer.h"
 #include "shader_types.h"
 #include "shaders/phong_shader.h"
+#include "shaders/unlit_shader.h"
 
 #include "rasterizer.h"
 #include "texture.h"
@@ -21,11 +22,15 @@ void Renderer::draw_mesh(const Mesh &mesh, const mat4 &model, const mat4 &mvp,
                          const Vec3 &view_pos, const AppState &state,
                          const Texture *texture) {
   PhongShader phong_shader;
+  UnlitShader unlit_shader;
 
   const IShader *shader = &phong_shader;
   switch (state.shader_type) {
   case ShaderType::Phong:
     shader = &phong_shader;
+    break;
+  case ShaderType::Unlit:
+    shader = &unlit_shader;
     break;
   }
 
