@@ -184,6 +184,12 @@ void draw(SDL_Texture *framebuffer_tex, AppState &state) {
     // bool perspctive_inter =
     //     state.persp_interp || (state.render_mode == RenderMode::Solid);
     if (state.render_mode == RenderMode::Solid) {
+      const char *shader_types[] = {"Phong"};
+      int current_shader = static_cast<int>(state.shader_type);
+      if (ImGui::Combo("Shader", &current_shader, shader_types, 1)) {
+        state.shader_type = static_cast<ShaderType>(current_shader);
+      }
+
       ImGui::Separator();
       ImGui::Checkbox("perspctive interp", &state.persp_interp_enabled);
 
@@ -191,7 +197,10 @@ void draw(SDL_Texture *framebuffer_tex, AppState &state) {
       ImGui::Checkbox("texture enabled", &state.texture_enabled);
 
       ImGui::Separator();
-      ImGui::Checkbox("light enabled", &state.light_enabled);
+      if (state.shader_type == ShaderType::Phong) {
+        ImGui::Checkbox("light enabled", &state.light_enabled);
+      }
+
       if (state.light_enabled) {
         ImGui::SliderFloat("light intensity:", &state.LIGHT_INTENSITY, 0.1f,
                            5.f);
