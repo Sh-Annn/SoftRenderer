@@ -7,7 +7,7 @@ enum class ProjectionType { Perspective, Orthographic };
 enum class RenderMode { Solid, WireFrame, Vertex };
 
 // enum class ShaderType { Phong, Unlit, NormalDebug };
-enum class ShaderType { Phong, Unlit };
+enum class ShaderType { Phong, Unlit, Depth };
 
 struct AppState {
   RenderMode render_mode = RenderMode::Solid;

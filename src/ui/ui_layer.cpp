@@ -184,9 +184,9 @@ void draw(SDL_Texture *framebuffer_tex, AppState &state) {
     // bool perspctive_inter =
     //     state.persp_interp || (state.render_mode == RenderMode::Solid);
     if (state.render_mode == RenderMode::Solid) {
-      const char *shader_types[] = {"Phong", "Unlit"};
+      const char *shader_types[] = {"Phong", "Unlit", "Depth"};
       int current_shader = static_cast<int>(state.shader_type);
-      if (ImGui::Combo("Shader", &current_shader, shader_types, 2)) {
+      if (ImGui::Combo("Shader", &current_shader, shader_types, 3)) {
         state.shader_type = static_cast<ShaderType>(current_shader);
       }
 

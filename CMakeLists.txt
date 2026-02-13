@@ -47,6 +47,7 @@ add_library(core STATIC
 	${CMAKE_SOURCE_DIR}/src/core/texture_loader.cpp
 	${CMAKE_SOURCE_DIR}/src/core/shaders/phong_shader.cpp
 	${CMAKE_SOURCE_DIR}/src/core/shaders/unlit_shader.cpp
+	${CMAKE_SOURCE_DIR}/src/core/shaders/depth_shader.cpp
 
 
 )

@@ -1,5 +1,6 @@
 #include "renderer.h"
 #include "shader_types.h"
+#include "shaders/depth_shader.h"
 #include "shaders/phong_shader.h"
 #include "shaders/unlit_shader.h"
 
@@ -23,6 +24,7 @@ void Renderer::draw_mesh(const Mesh &mesh, const mat4 &model, const mat4 &mvp,
                          const Texture *texture) {
   PhongShader phong_shader;
   UnlitShader unlit_shader;
+  DepthShader depth_shader;
 
   const IShader *shader = &phong_shader;
   switch (state.shader_type) {
@@ -31,6 +33,9 @@ void Renderer::draw_mesh(const Mesh &mesh, const mat4 &model, const mat4 &mvp,
     break;
   case ShaderType::Unlit:
     shader = &unlit_shader;
+    break;
+  case ShaderType::Depth:
+    shader = &depth_shader;
     break;
   }
 
