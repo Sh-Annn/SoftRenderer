@@ -9,12 +9,16 @@ struct VertexIn {
   Vec3 position = {0.f, 0.f, 0.f};
   Vec3 normal = {0.f, 0.f, 0.f};
   Vec2 uv = {0.f, 0.f};
+  Vec3 tangent = {1.f, 0.f, 0.f};
+  Vec3 bitangent = {0.f, 1.f, 0.f};
 };
 
 struct VertexOut {
   Vec4 clip_pos = {0.f, 0.f, 0.f, 1.f};
   Vec3 world_pos = {0.f, 0.f, 0.f};
   Vec3 normal = {0.f, 0.f, 1.f};
+  Vec3 tangent = {1.f, 0.f, 0.f};
+  Vec3 bitangent = {0.f, 1.f, 0.f};
   Vec2 uv = {0.f, 0.f};
   float inv_w = 0.f;
 };
@@ -22,6 +26,8 @@ struct VertexOut {
 struct FragmentIn {
   Vec3 world_pos = {0.f, 0.f, 0.f};
   Vec3 normal = {0.f, 0.f, 1.f};
+  Vec3 tangent = {1.f, 0.f, 0.f};
+  Vec3 bitangent = {0.f, 1.f, 0.f};
   Vec2 uv = {0.f, 0.f};
   float depth = 1.f;
 };
@@ -47,11 +53,13 @@ struct ShaderUniforms {
   float shininess = 150.f;
 
   bool texture_enabled = false;
+  bool normal_map_enabled = false;
   bool light_enabled = true;
   bool diff_enabled = true;
   bool spec_enabled = true;
   bool persp_interp_enabled = true;
 
   const Texture *texture = nullptr;
+  const Texture *normal_map = nullptr;
 };
 } // namespace core

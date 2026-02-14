@@ -14,7 +14,8 @@ public:
 
   void draw_mesh(const Mesh &mesh, const mat4 &model, const mat4 &mvp,
                  const Vec3 &view_pos, const AppState &state,
-                 const Texture *texture = nullptr);
+                 const Texture *texture = nullptr,
+                 const Texture *normal_map = nullptr);
 
   void set_viewport(int width, int height);
 

@@ -122,12 +122,28 @@ void Rasterizer::rasterize_triangle_region(const Vertex &v0, const Vertex &v1,
             (alpha * v0.world_pos * inv_w0 + beta * v1.world_pos * inv_w1 +
              gama * v2.world_pos * inv_w2) /
             inv_w;
-        fin.normal = glm::normalize((alpha * v0.normal * inv_w0 +
-                                     beta * v1.normal * inv_w1 +
-                                     gama * v2.normal * inv_w2) /
-                                    inv_w);
-
+        const Vec3 normal = glm::normalize((alpha * v0.normal * inv_w0 +
+                                            beta * v1.normal * inv_w1 +
+                                            gama * v2.normal * inv_w2) /
+                                           inv_w);
+        const Vec3 tangent = glm::normalize((alpha * v0.tangent * inv_w0 +
+                                             beta * v1.tangent * inv_w1 +
+                                             gama * v2.tangent * inv_w2) /
+                                            inv_w);
+        const Vec3 bitangent = glm::normalize((alpha * v0.bitangent * inv_w0 +
+                                               beta * v1.bitangent * inv_w1 +
+                                               gama * v2.bitangent * inv_w2) /
+                                              inv_w);
+        fin.normal = glm::dot(normal, normal) > 1e-8f ? glm::normalize(normal)
+                                                      : Vec3(0.f, 0.f, 1.f);
+        fin.tangent = glm::dot(tangent, tangent) > 1e-8f
+                          ? glm::normalize(tangent)
+                          : Vec3(1.f, 0.f, 0.f);
+        fin.bitangent = glm::dot(bitangent, bitangent) > 1e-8f
+                            ? glm::normalize(bitangent)
+                            : Vec3(0.f, 1.f, 0.f);
         const FragmentOut fout = shader.fragment(fin, uniforms);
+
         if (fout.discard) {
           continue;
         }

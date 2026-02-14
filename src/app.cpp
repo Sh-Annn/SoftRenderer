@@ -27,12 +27,15 @@ bool App::init(const char *title, int window_width, int window_height) {
   m_camera.set_perspective(45.f, (float)RD_WIDTH / RD_HEIGHT, 2.f, 100.f);
   m_camera.sync_orthographic_to_perspective(4.f);
 
-  m_mesh = core::MeshLoader::load_obj("../obj/diablo3_pose/diablo3_pose.obj",
-                                      0xFF80FF);
+  m_mesh = core::MeshLoader::load_obj("../obj/boggie/body.obj", 0xFF80FF);
 
-  if (!core::TextureLoader::load("../obj/diablo3_pose/diablo3_pose_diffuse.tga",
-                                 m_texture)) {
+  if (!core::TextureLoader::load("../obj/boggie/body_diffuse.tga", m_texture)) {
     std::cerr << "Failed to load diffuse texture!\n";
+    return false;
+  }
+  if (!core::TextureLoader::load("../obj/boggie/body_nm_tangent.tga",
+                                 m_normal_map)) {
+    std::cerr << "Failed to load normal map texture!\n";
     return false;
   }
 
@@ -171,7 +174,7 @@ void App::render() {
   mat4 mvp = m_camera.mvp_matrix(model);
 
   m_renderer->draw_mesh(m_mesh, model, mvp, m_camera.postion(), m_app_state,
-                        &m_texture);
+                        &m_texture, &m_normal_map);
   // m_renderer->draw_mesh(m_mesh, mvp);
 
   m_fb_texture.update(m_rasterizer.frame_buffer());

@@ -11,6 +11,8 @@ public:
   std::vector<Vec3> positions;
   std::vector<Vec3> normals;
   std::vector<Vec2> texcoords;
+  std::vector<Vec3> tangents;
+  std::vector<Vec3> bitangents;
 
   std::vector<int> indices;
 
@@ -22,6 +24,10 @@ public:
 
   bool has_normals() const { return !normals.empty(); }
   bool has_texcoords() const { return !texcoords.empty(); }
+  bool has_tangent_space() const {
+    return tangents.size() == positions.size() &&
+           bitangents.size() == positions.size() && !tangents.empty();
+  }
   // bool use_vertex_colors() const { return !vertex_colors.empty(); }
   // bool use_triangle_colors() const { return !triangle_colors.empty(); }
 

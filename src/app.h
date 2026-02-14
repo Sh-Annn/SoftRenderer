@@ -51,4 +51,5 @@ private:
 
   core::Mesh m_mesh;
   core::Texture m_texture;
+  core::Texture m_normal_map;
 };

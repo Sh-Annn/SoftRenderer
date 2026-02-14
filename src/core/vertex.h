@@ -10,5 +10,7 @@ struct Vertex {
 
   Vec3 world_pos;
   Vec3 normal;
+  Vec3 tangent;
+  Vec3 bitangent;
 };
 } // namespace core

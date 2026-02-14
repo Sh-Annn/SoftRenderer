@@ -21,7 +21,7 @@ Renderer::Renderer(Rasterizer *rasterizer, int viewport_width,
 
 void Renderer::draw_mesh(const Mesh &mesh, const mat4 &model, const mat4 &mvp,
                          const Vec3 &view_pos, const AppState &state,
-                         const Texture *texture) {
+                         const Texture *texture, const Texture *normal_map) {
   PhongShader phong_shader;
   UnlitShader unlit_shader;
   DepthShader depth_shader;
@@ -45,6 +45,8 @@ void Renderer::draw_mesh(const Mesh &mesh, const mat4 &model, const mat4 &mvp,
   uniforms.view_pos = view_pos;
   uniforms.texture = texture;
   uniforms.texture_enabled = state.texture_enabled;
+  uniforms.normal_map = normal_map;
+  uniforms.normal_map_enabled = state.normal_map_enabled;
   uniforms.light_enabled = state.light_enabled;
   uniforms.diff_enabled = state.diff_enabled;
   uniforms.spec_enabled = state.spec_enabled;
@@ -79,9 +81,20 @@ void Renderer::draw_mesh(const Mesh &mesh, const mat4 &model, const mat4 &mvp,
       uv2 = mesh.texcoords[i2];
     }
 
-    const VertexOut out0 = shader->vertex({v0, n0, uv0}, uniforms);
-    const VertexOut out1 = shader->vertex({v1, n1, uv1}, uniforms);
-    const VertexOut out2 = shader->vertex({v2, n2, uv2}, uniforms);
+    Vec3 t0(1.f, 0.f, 0.f), t1(1.f, 0.f, 0.f), t2(1.f, 0.f, 0.f);
+    Vec3 b0(0.f, 1.f, 0.f), b1(0.f, 1.f, 0.f), b2(0.f, 1.f, 0.f);
+    if (mesh.has_tangent_space()) {
+      t0 = mesh.tangents[i0];
+      t1 = mesh.tangents[i1];
+      t2 = mesh.tangents[i2];
+      b0 = mesh.bitangents[i0];
+      b1 = mesh.bitangents[i1];
+      b2 = mesh.bitangents[i2];
+    }
+
+    const VertexOut out0 = shader->vertex({v0, n0, uv0, t0, b0}, uniforms);
+    const VertexOut out1 = shader->vertex({v1, n1, uv1, t1, b1}, uniforms);
+    const VertexOut out2 = shader->vertex({v2, n2, uv2, t2, b2}, uniforms);
 
     const Vec4 clip0 = out0.clip_pos;
     const Vec4 clip1 = out1.clip_pos;
@@ -111,9 +124,12 @@ void Renderer::draw_mesh(const Mesh &mesh, const mat4 &model, const mat4 &mvp,
     if (state.render_mode == RenderMode::Solid) {
       ScreenTriangle tri;
 
-      tri.v0 = {screen0, out0.uv, clip0.w, out0.world_pos, out0.normal};
-      tri.v1 = {screen1, out1.uv, clip1.w, out1.world_pos, out1.normal};
-      tri.v2 = {screen2, out2.uv, clip2.w, out2.world_pos, out2.normal};
+      tri.v0 = {screen0,     out0.uv,      clip0.w,       out0.world_pos,
+                out0.normal, out0.tangent, out0.bitangent};
+      tri.v1 = {screen1,     out1.uv,      clip1.w,       out1.world_pos,
+                out1.normal, out1.tangent, out1.bitangent};
+      tri.v2 = {screen2,     out2.uv,      clip2.w,       out2.world_pos,
+                out2.normal, out2.tangent, out2.bitangent};
       tri.area = m_rasterizer->signed_triangle_area(tri.v0.pos, tri.v1.pos,
                                                     tri.v2.pos);
       if (m_rasterizer->is_back_face_enabled() && tri.area > 0.f) {

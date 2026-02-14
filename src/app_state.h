@@ -26,6 +26,7 @@ struct AppState {
   bool persp_interp_enabled = true;
 
   bool texture_enabled = false;
+  bool normal_map_enabled = false;
 
   bool light_enabled = true;
   bool diff_enabled = true;

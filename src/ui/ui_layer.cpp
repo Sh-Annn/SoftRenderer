@@ -198,6 +198,7 @@ void draw(SDL_Texture *framebuffer_tex, AppState &state) {
 
       ImGui::Separator();
       if (state.shader_type == ShaderType::Phong) {
+        ImGui::Checkbox("normal_map enabled", &state.normal_map_enabled);
         ImGui::Checkbox("light enabled", &state.light_enabled);
       }
 
