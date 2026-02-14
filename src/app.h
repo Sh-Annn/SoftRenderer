@@ -12,6 +12,8 @@
 #include "platform/sdl_app.h"
 #include "platform/sdl_texture.h"
 
+#include <string>
+
 class App {
 public:
   App() = default;
@@ -32,6 +34,8 @@ public:
 
 private:
   void handle_input();
+  std::string next_screenshot_path();
+  void save_screenshot_if_requested();
 
   static constexpr int RD_WIDTH = 900;
   static constexpr int RD_HEIGHT = 600;
@@ -52,4 +56,7 @@ private:
   core::Mesh m_mesh;
   core::Texture m_texture;
   core::Texture m_normal_map;
+
+  bool m_screenshot_requested = false;
+  int m_screenshot_index = 0;
 };

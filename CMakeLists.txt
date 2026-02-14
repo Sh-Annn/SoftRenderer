@@ -45,6 +45,7 @@ add_library(core STATIC
 	${CMAKE_SOURCE_DIR}/src/core/mesh_loader.cpp
 	${CMAKE_SOURCE_DIR}/src/core/texture.cpp
 	${CMAKE_SOURCE_DIR}/src/core/texture_loader.cpp
+	${CMAKE_SOURCE_DIR}/src/core/framebuffer_export.cpp
 	${CMAKE_SOURCE_DIR}/src/core/shaders/phong_shader.cpp
 	${CMAKE_SOURCE_DIR}/src/core/shaders/unlit_shader.cpp
 	${CMAKE_SOURCE_DIR}/src/core/shaders/depth_shader.cpp

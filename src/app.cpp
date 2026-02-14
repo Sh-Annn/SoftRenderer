@@ -1,13 +1,16 @@
 #include "app.h"
 
-#include "color.h"
-
+#include "core/framebuffer_export.h"
 #include "core/mesh_loader.h"
 #include "core/texture_loader.h"
+#include "framebuffer_export.h"
 #include "ui/ui_layer.h"
 
 #include <SDL2/SDL.h>
+#include <filesystem>
+#include <iomanip>
 #include <iostream>
+#include <sstream>
 
 bool App::init(const char *title, int window_width, int window_height) {
   if (!m_sdl_app.init(title, window_width, window_height)) {
@@ -65,6 +68,11 @@ bool App::handle_events() {
     }
     if (e.type == SDL_WINDOWEVENT && e.window.event == SDL_WINDOWEVENT_CLOSE) {
       m_running = false;
+    }
+
+    if (e.type == SDL_KEYDOWN && e.key.repeat == 0 &&
+        e.key.keysym.scancode == SDL_SCANCODE_F12) {
+      m_screenshot_requested = true;
     }
   }
 
@@ -177,6 +185,8 @@ void App::render() {
                         &m_texture, &m_normal_map);
   // m_renderer->draw_mesh(m_mesh, mvp);
 
+  save_screenshot_if_requested();
+
   m_fb_texture.update(m_rasterizer.frame_buffer());
 
   // app
@@ -188,4 +198,30 @@ void App::render() {
   ui::end_frame(m_sdl_app.renderer());
 
   m_sdl_app.end_frame();
+}
+
+std::string App::next_screenshot_path() {
+  std::filesystem::create_directories("captures");
+
+  std::ostringstream oss;
+  oss << "captures/frame_" << std::setw(6) << std::setfill('0')
+      << m_screenshot_index++ << ".png";
+  return oss.str();
+}
+
+void App::save_screenshot_if_requested() {
+  if (!m_screenshot_requested) {
+    return;
+  }
+  m_screenshot_requested = false;
+
+  const std::string path = next_screenshot_path();
+  const bool ok = core::save_framebuffer_png(m_rasterizer.frame_buffer(),
+                                             RD_WIDTH, RD_HEIGHT, path);
+
+  if (ok) {
+    std::cout << "Screenshot saved: " << path << '\n';
+  } else {
+    std::cerr << "Failed to save screenshot: " << path << '\n';
+  }
 }
