@@ -32,6 +32,9 @@ target_include_directories(imgui PUBLIC
 
 target_compile_options(imgui PRIVATE ${SDL2_CFLAGS_OTHER})
 
+# native file dialog extended---------------------------------
+add_subdirectory(${CMAKE_SOURCE_DIR}/libs/nativefiledialog-extended EXCLUDE_FROM_ALL)
+
 # stb_image --------------------------------------------------
 include_directories(${CMAKE_SOURCE_DIR}/libs/stb)
 
@@ -108,5 +111,6 @@ target_link_libraries(soft_renderer PRIVATE
 	platform
 	core
 	ui
+	nfd::nfd
 )
 

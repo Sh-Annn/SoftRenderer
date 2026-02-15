@@ -1,6 +1,7 @@
 #pragma once
 
 #include "types.h"
+#include <string>
 
 enum class ProjectionType { Perspective, Orthographic };
 
@@ -36,4 +37,11 @@ struct AppState {
 
   bool clipping_enabled = true;
   bool back_face_enabled = true;
+
+  bool request_load_model = false;
+  bool request_load_diffuse = false;
+  bool request_load_normal = false;
+
+  std::string load_path = "../obj";
+  std::string io_status = "Ready";
 };
