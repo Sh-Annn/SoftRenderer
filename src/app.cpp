@@ -5,7 +5,7 @@
 #include "core/texture_loader.h"
 #include "ui/ui_layer.h"
 
-#include <SDL2/SDL.h>
+#include "platform/sdl_include.h"
 #include <filesystem>
 #include <iomanip>
 #include <iostream>
@@ -21,7 +21,11 @@ bool open_file_dialog(const nfdu8filteritem_t *fileters, nfdfiltersize_t count,
   std::string default_dir;
   if (!current_path.empty()) {
     std::filesystem::path path(current_path);
-    default_dir = path.has_parent_path() ? path.parent_path().string() : "";
+    if (path.has_parent_path()) {
+      default_dir = std::filesystem::absolute(path).parent_path().string();
+    } else {
+      default_dir = "";
+    }
   }
 
   nfdu8char_t *picked_path = nullptr;

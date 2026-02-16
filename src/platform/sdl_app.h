@@ -1,6 +1,6 @@
 #pragma once
 
-#include <SDL2/SDL.h>
+#include "sdl_include.h"
 
 namespace platform {
 class SdlApp {

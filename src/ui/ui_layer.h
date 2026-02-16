@@ -1,5 +1,5 @@
 #pragma once
-#include <SDL2/SDL.h>
+#include "../platform/sdl_include.h"
 
 struct AppState;
 

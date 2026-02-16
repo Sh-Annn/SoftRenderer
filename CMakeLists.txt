@@ -6,9 +6,22 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 option(ENABLE_OPENMP "Enabled OpenMP for core rendering" ON)
 
+if(MSVC)
+	add_compile_options(/utf-8)
+endif()
+
 # sdl2 -------------------------------------------------------
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(SDL2 REQUIRED sdl2)
+if(WIN32)
+	find_package(SDL2 CONFIG REQUIRED)
+	set(SDL2_LIBS SDL2::SDL2 SDL2::SDL2main)
+else()
+	find_package(PkgConfig REQUIRED)
+	pkg_check_modules(SDL2 REQUIRED sdl2)
+	set(SDL2_LIBS $(SDL2_LIBRARIES))
+endif()
+
+# glm --------------------------------------------------------
+set(GLM_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/libs)
 
 # ImGui ------------------------------------------------------
 set(IMGUI_DIR ${CMAKE_SOURCE_DIR}/libs/imgui)
@@ -27,6 +40,7 @@ target_include_directories(imgui PUBLIC
 	${IMGUI_DIR}
 	${IMGUI_DIR}/backends
 	${SDL2_INCLUDE_DIRS}
+	${GLM_INCLUDE_DIR}
 	# ${CMAKE_SOURCE_DIR}/src
 )
 
@@ -58,6 +72,7 @@ add_library(core STATIC
 target_include_directories(core PUBLIC
 	${CMAKE_SOURCE_DIR}/src/core
 	${CMAKE_SOURCE_DIR}/src
+	${GLM_INCLUDE_DIR}
 )
 
 if(ENABLE_OPENMP)
@@ -78,6 +93,7 @@ target_include_directories(platform PUBLIC
 	${CMAKE_SOURCE_DIR}/src/platform
 	${SDL2_INCLUDE_DIRS}
 	${CMAKE_SOURCE_DIR}/src
+	${GLM_INCLUDE_DIR}
 )
 target_link_libraries(platform PUBLIC ${SDL2_LIBRARIES})
 target_compile_options(platform PUBLIC ${SDL2_CFLAGS_OTHER})
