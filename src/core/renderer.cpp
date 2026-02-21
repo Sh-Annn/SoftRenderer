@@ -5,7 +5,6 @@
 #include "shaders/unlit_shader.h"
 
 #include "../app_state.h"
-#include "../platform/sdl_include.h"
 #include "rasterizer.h"
 #include "texture.h"
 
