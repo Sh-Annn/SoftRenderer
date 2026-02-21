@@ -15,6 +15,7 @@ bool TextureLoader::load(const std::string &filename, Texture &out_texture) {
   if (!data) {
     std::cerr << "Failed to load texture: " << filename << '\n';
     std::cerr << "  Reason: " << stbi_failure_reason() << '\n';
+    return false;
   }
 
   out_texture.create(width, height, channels, data);

@@ -1,8 +1,10 @@
 #pragma once
 
 #include "../types.h"
+#include "app_state.h"
 #include "mesh.h"
 #include "rasterizer.h"
+#include "shader_types.h"
 #include "texture.h"
 
 struct AppState;
@@ -24,6 +26,9 @@ public:
   bool is_clipping_enabled() const { return m_clipping_enabled; }
 
 private:
+  void emit_triangle(const VertexOut &out0, const VertexOut &out1,
+                     const VertexOut &out2, const AppState &state,
+                     std::vector<ScreenTriangle> &solid_tris);
   Vec3 perspective_divide(const Vec4 &clip_pos) const;
   Vec3 viewport_transform(const Vec3 &ndc) const;
 
