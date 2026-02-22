@@ -135,38 +135,41 @@ bool App::handle_events() {
   return m_running;
 }
 
-void App::handle_input() {
+void App::handle_input(float delta_time) {
   if (!ui::is_mouse_in_render_area()) {
     return;
   }
+
+  const float move_step = MOVE_SPEED * delta_time;
+
   // forward - backward
   if (m_input.is_key_down(SDL_SCANCODE_W)) {
     // std::cout << "W pressed\n";
-    m_camera.move_forward(MOVE_SPEED);
+    m_camera.move_forward(move_step);
   }
   if (m_input.is_key_down(SDL_SCANCODE_S)) {
     // std::cout << "S pressed\n";
-    m_camera.move_forward(-MOVE_SPEED);
+    m_camera.move_forward(-move_step);
   }
 
   // left - right
   if (m_input.is_key_down(SDL_SCANCODE_A)) {
     // std::cout << "A pressed\n";
-    m_camera.move_right(-MOVE_SPEED);
+    m_camera.move_right(-move_step);
   }
   if (m_input.is_key_down(SDL_SCANCODE_D)) {
     // std::cout << "D pressed\n";
-    m_camera.move_right(MOVE_SPEED);
+    m_camera.move_right(move_step);
   }
 
   // up - down
   if (m_input.is_key_down(SDL_SCANCODE_SPACE)) {
     // std::cout << "SPACE pressed\n";
-    m_camera.move_up(MOVE_SPEED);
+    m_camera.move_up(move_step);
   }
   if (m_input.is_key_down(SDL_SCANCODE_LSHIFT)) {
     // std::cout << "LSHIFT pressed\n";
-    m_camera.move_up(-MOVE_SPEED);
+    m_camera.move_up(-move_step);
   }
 
   if (m_input.is_mouse_button_down(SDL_BUTTON_RIGHT)) {
@@ -179,7 +182,15 @@ void App::handle_input() {
 }
 
 void App::update() {
-  handle_input();
+  const uint64_t now_ticks = SDL_GetTicks64();
+  float delta_time_seconds = 0.0f;
+  if (m_last_update_ticks != 0 && now_ticks >= m_last_update_ticks) {
+    delta_time_seconds =
+        static_cast<float>(now_ticks - m_last_update_ticks) / 1000.0f;
+  }
+  m_last_update_ticks = now_ticks;
+
+  handle_input(delta_time_seconds);
   process_file_dialog_requests();
 }
 

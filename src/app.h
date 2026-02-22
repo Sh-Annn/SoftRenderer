@@ -48,7 +48,7 @@ private:
     uint64_t frame_id = 0;
   };
 
-  void handle_input();
+  void handle_input(float delta_time);
   void process_file_dialog_requests();
   void start_render_worker();
   void stop_render_worker();
@@ -60,7 +60,7 @@ private:
 
   static constexpr int RD_WIDTH = 900;
   static constexpr int RD_HEIGHT = 600;
-  static constexpr float MOVE_SPEED = 0.05f;
+  static constexpr float MOVE_SPEED = 2.f;
   static constexpr float ROTATE_SPEED = 0.2f;
 
   bool m_running = false;
@@ -92,6 +92,7 @@ private:
   bool m_has_pending_job = false;
   bool m_stop_render_worker = false;
   uint64_t m_next_frame_id = 1;
+  uint64_t m_last_update_ticks = 0;
 
   std::mutex m_frame_mutex;
   std::vector<Color> m_latest_frame;
