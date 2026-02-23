@@ -42,6 +42,8 @@ struct AppState {
   bool request_load_diffuse = false;
   bool request_load_normal = false;
 
-  std::string load_path = "../obj";
+  std::string model_path = "../obj/african_head/african_head/african_head.obj";
+  std::string diffuse_path = "../obj/african_head/african_head_diffuse.tga";
+  std::string normal_path = "../obj/african_head/african_head_nm_tangent.tga";
   std::string io_status = "Ready";
 };

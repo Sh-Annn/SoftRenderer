@@ -78,13 +78,13 @@ bool App::init(const char *title, int window_width, int window_height) {
   m_camera.set_perspective(45.f, (float)RD_WIDTH / RD_HEIGHT, 2.f, 100.f);
   m_camera.sync_orthographic_to_perspective(4.f);
 
-  m_mesh = core::MeshLoader::load_obj("../obj/boggie/body.obj", 0xFF80FF);
+  m_mesh = core::MeshLoader::load_obj("../obj/african_head/african_head.obj", 0xFF80FF);
 
-  if (!core::TextureLoader::load("../obj/boggie/body_diffuse.tga", m_texture)) {
+  if (!core::TextureLoader::load("../obj/african_head/african_head_diffuse.tga", m_texture)) {
     std::cerr << "Failed to load diffuse texture!\n";
     return false;
   }
-  if (!core::TextureLoader::load("../obj/boggie/body_nm_tangent.tga",
+  if (!core::TextureLoader::load("../obj/african_head/african_head_nm_tangent.tga",
                                  m_normal_map)) {
     std::cerr << "Failed to load normal map texture!\n";
     return false;
@@ -209,7 +209,7 @@ void App::process_file_dialog_requests() {
         {"Wavefront OBJ:", "obj"}};
 
     std::string selected_path;
-    if (!open_file_dialog(kModelFilters, 1, m_app_state.load_path,
+    if (!open_file_dialog(kModelFilters, 1, m_app_state.model_path,
                           selected_path, m_app_state.io_status)) {
       return;
     }
@@ -221,7 +221,7 @@ void App::process_file_dialog_requests() {
     }
 
     m_mesh = std::move(mesh);
-    m_app_state.load_path = selected_path;
+    m_app_state.model_path = selected_path;
     m_app_state.io_status = "Model loaded";
     return;
   }
@@ -232,7 +232,7 @@ void App::process_file_dialog_requests() {
         {"Image files:", "png,jpg,jpeg,tga,bmp"}};
 
     std::string selected_path;
-    if (!open_file_dialog(kTextureFilters, 1, m_app_state.load_path,
+    if (!open_file_dialog(kTextureFilters, 1, m_app_state.diffuse_path,
                           selected_path, m_app_state.io_status)) {
       return;
     }
@@ -244,7 +244,7 @@ void App::process_file_dialog_requests() {
     }
 
     m_texture = std::move(texture);
-    m_app_state.load_path = selected_path;
+    m_app_state.diffuse_path = selected_path;
     m_app_state.io_status = "Diffuse loaded";
     return;
   }
@@ -255,7 +255,7 @@ void App::process_file_dialog_requests() {
         {"Image files:", "png,jpg,jpeg,tga,bmp"}};
 
     std::string selected_path;
-    if (!open_file_dialog(kTextureFilters, 1, m_app_state.load_path,
+    if (!open_file_dialog(kTextureFilters, 1, m_app_state.normal_path,
                           selected_path, m_app_state.io_status)) {
       return;
     }
@@ -267,7 +267,7 @@ void App::process_file_dialog_requests() {
     }
 
     m_normal_map = std::move(texture);
-    m_app_state.load_path = selected_path;
+    m_app_state.normal_path = selected_path;
     m_app_state.io_status = "Normal map loaded";
   }
 }

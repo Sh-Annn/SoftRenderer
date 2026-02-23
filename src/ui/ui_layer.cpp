@@ -121,17 +121,17 @@ void draw(SDL_Texture *framebuffer_tex, AppState &state) {
       if (ImGui::Button("Load Model (.obj)", ImVec2(-1, 0))) {
         state.request_load_model = true;
       }
-      ImGui::TextWrapped("Model: %s", state.load_path.c_str());
+      ImGui::TextWrapped("Model: %s", state.model_path.c_str());
 
       if (ImGui::Button("Load Diffuse Texture", ImVec2(-1, 0))) {
         state.request_load_diffuse = true;
       }
-      ImGui::TextWrapped("Diffuse: %s", state.load_path.c_str());
+      ImGui::TextWrapped("Diffuse: %s", state.diffuse_path.c_str());
 
       if (ImGui::Button("Load Normal Map", ImVec2(-1, 0))) {
         state.request_load_normal = true;
       }
-      ImGui::TextWrapped("Normal: %s", state.load_path.c_str());
+      ImGui::TextWrapped("Normal: %s", state.normal_path.c_str());
 
       ImGui::Separator();
       ImGui::TextWrapped("Status: %s", state.io_status.c_str());
