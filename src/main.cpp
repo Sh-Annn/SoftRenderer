@@ -1,6 +1,7 @@
 #include "app.h"
+#include "platform/sdl_include.h"
 
-int main() {
+int main(int argc, char* argv[]) {
   App app;
 
   if (!app.init("Soft Renderer", 1300, 600)) {
