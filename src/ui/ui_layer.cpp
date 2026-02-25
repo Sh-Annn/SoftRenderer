@@ -189,8 +189,11 @@ void draw(SDL_Texture *framebuffer_tex, AppState &state) {
 
       ImGui::Separator();
 
-      if (state.render_mode == RenderMode::Solid ||
-          state.render_mode == RenderMode::WireFrame) {
+      ImGui::Checkbox("clipping", &state.clipping_enabled);
+
+      // bool perspctive_inter =
+      //     state.persp_interp || (state.render_mode == RenderMode::Solid);
+      if (state.render_mode == RenderMode::Solid) {
         ImGui::Checkbox("Depth Test", &state.depth_test_enabled);
         if (!state.depth_test_enabled) {
           ImGui::SameLine();
@@ -201,18 +204,17 @@ void draw(SDL_Texture *framebuffer_tex, AppState &state) {
           }
         }
 
-        ImGui::Checkbox("clipping", &state.clipping_enabled);
         ImGui::Checkbox("back_face", &state.back_face_enabled);
-      }
 
-      // bool perspctive_inter =
-      //     state.persp_interp || (state.render_mode == RenderMode::Solid);
-      if (state.render_mode == RenderMode::Solid) {
         const char *shader_types[] = {"Phong", "Unlit", "Depth"};
         int current_shader = static_cast<int>(state.shader_type);
         if (ImGui::Combo("Shader", &current_shader, shader_types, 3)) {
           state.shader_type = static_cast<ShaderType>(current_shader);
         }
+
+
+
+
 
         ImGui::Separator();
         ImGui::Checkbox("perspctive interp", &state.persp_interp_enabled);
