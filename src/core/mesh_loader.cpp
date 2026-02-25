@@ -11,7 +11,7 @@ Mesh MeshLoader::load_obj(const std::string &filename, Color default_color) {
 
   std::filesystem::path path;
 #ifdef _WIN32
-  const auto *utf9=8 = reinterpret_cast<const char8_t *>(filename.data());
+  const auto *utf8 = reinterpret_cast<const char8_t *>(filename.data());
   path = std::filesystem::path(std::u8string(utf8, utf8 + filename.size()));
 #else
   path = std::filesystem::path(filename);
